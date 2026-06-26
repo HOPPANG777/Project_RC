@@ -50,3 +50,18 @@
 | --- | --- |
 | `.git` | 저장소 내부 파일이므로 Directing 산출물로 복사하지 않음 |
 | `.agents` | 원본 내 확인 가능한 파일 없음 |
+
+## 추가 관리 문서
+
+| 파일 | 목적 |
+| --- | --- |
+| `Directing_Files/README.md` | Directing_Files 전체 색인 |
+| `Ideas/StockRhythm/README.md` | StockRhythm 기획 폴더 안내 |
+| `Ideas/StockRhythm/STOCK_RHYTHM_DIRECTION_BRIEF.md` | 현재 적용할 제작 방향 |
+| `Ideas/StockRhythm/STOCK_RHYTHM_MVP_TASKS.md` | MVP 제작 체크리스트 |
+| `Ideas/StockRhythm/STOCK_RHYTHM_SAMSU_MVP_SPEC.md` | SAMSU 기준 MVP 판정/점수 사양 |
+| `ProjectDirectAsset/StockRhythm/README.md` | 자산 폴더 안내 |
+| `ProjectDirectAsset/StockRhythm/ASSET_MANIFEST.md` | 콘셉트 이미지와 추가 필요 자산 목록 |
+| `UpdateLog/StockRhythm/README.md` | 로그 폴더 안내 |
+| `UpdateLog/StockRhythm/STOCK_RHYTHM_DIRECTING_MIGRATION_LOG.md` | Directing_Files 이관 로그 |
+| `UpdateLog/StockRhythm/STOCK_RHYTHM_MVP_DECISION_LOG.md` | MVP 확정 사항 기록 |

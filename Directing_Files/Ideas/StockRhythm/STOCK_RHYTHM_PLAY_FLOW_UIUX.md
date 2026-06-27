@@ -25,6 +25,30 @@ Title
 | 주요 버튼 | Start, Quit |
 | 안전 문구 | PROFIT은 실제 수익이 아닌 게임 점수 |
 
+### Title 채택 요소
+
+Title 화면에는 아래 요소를 채택한다.
+
+| 구분 | 채택 요소 | 설명 |
+| --- | --- | --- |
+| 브랜딩 | Game Title | `StockRhythm` |
+| 브랜딩 | Tagline | 게임 부제. 가상 차트 리듬 게임임을 짧게 설명 |
+| 진입 | Start Button | Stage Brief로 진입 |
+| 진입 | Quit Button | 게임 종료 |
+| 설정 | Settings Button | 일반 옵션 진입 |
+| 설정 | Sync/Offset Entry | 리듬게임 보정 옵션 진입 |
+| 안내 | Safety Text | 실제 투자/수익이 아님을 고지 |
+| 안내 | Version Text | 내부 테스트 빌드 표기 |
+| 배경 | Background Visual | 어두운 차트/캔들 분위기 |
+| 배경 | Animated Chart Motif | Title 배경에 은은한 차트 움직임 |
+
+Title에서 제외:
+
+| 제외 요소 | 이유 |
+| --- | --- |
+| Stage Preview | Stage Brief 화면에서 다룸 |
+| 실제 종목/가격 정보 | 실제 투자 오해 방지 |
+
 표시 문구 후보:
 
 ```text
@@ -41,6 +65,21 @@ PROFIT is score, not real return
 | 스테이지 | SAMSU |
 | 핵심 정보 | 급락, 반등, 전환이 있는 가상 차트 |
 | 주요 버튼 | Play, Back |
+
+### Stage Brief 채택 요소
+
+| 채택 요소 | 역할 |
+| --- | --- |
+| Stage Name | `SAMSU` 표시 |
+| Stage Subtitle | 전자/제조풍 가상 종목 분위기 설명 |
+| Mood Keywords | Drop / Rebound / Switch |
+| Short Description | 급락과 반등이 섞인 가상 차트 설명 |
+| Play Button | Gameplay로 진입 |
+| Back Button | Title로 복귀 |
+| Safety Text | 실제 투자/실제 종목 아님 고지 |
+| Mini Chart Preview | 스테이지 분위기용 가상 차트 실루엣 |
+| Difficulty Hint | 쉬움/보통 같은 간단한 체감 난이도 |
+| Length Hint | 30초 내외 등 플레이 길이 안내 |
 
 표시 문구 후보:
 

@@ -18,7 +18,7 @@
 | --- | --- |
 | `Ideas/StockRhythm` | StockRhythm 기획 원문, 방향성 요약, MVP 작업 문서 |
 | `ProjectDirectAsset/StockRhythm` | Word 기획서, 콘셉트 이미지, 이미지 제작 프롬프트, 원본 메타 보관 |
-| `UpdateLog/StockRhythm` | 원본 변경 로그와 이번 Directing_Files 이관 로그 |
+| `UpdateLog/StockRhythm` | StockRhythm 단일 업데이트 로그 |
 
 ## 주요 색인
 
@@ -29,6 +29,6 @@
 - `Ideas/StockRhythm/STOCK_RHYTHM_NEXT_PLANNING_ITEMS.md`: 추가 진행 기획안 목록
 - `Ideas/StockRhythm/STOCK_RHYTHM_PLAY_FLOW_UIUX.md`: 플레이 흐름과 UI/UX 화면 구성
 - `Ideas/StockRhythm/STOCK_RHYTHM_DESIGN_GUIDE.md`: MVP 디자인 양식과 화면 톤 기준
+- `Ideas/StockRhythm/STOCK_RHYTHM_SCENE_ELEMENT_LIST.md`: 씬별 후보 요소 목록
 - `ProjectDirectAsset/StockRhythm/ASSET_MANIFEST.md`: 콘셉트 이미지 자산 목록
-- `UpdateLog/StockRhythm/STOCK_RHYTHM_DIRECTING_MIGRATION_LOG.md`: 이번 이관 작업 로그
-- `UpdateLog/StockRhythm/STOCK_RHYTHM_MVP_DECISION_LOG.md`: MVP 확정 사항 기록
+- `UpdateLog/StockRhythm/PROJECT_UPDATE_LOG.md`: StockRhythm 단일 업데이트 로그

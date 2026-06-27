@@ -68,6 +68,30 @@ StockRhythm MVP의 화면 디자인 양식을 정리한다.
 | 버튼 | Start를 가장 강조 |
 | 문구 | 안전 문구를 하단에 작게 표시 |
 
+Title 채택 요소:
+
+| 요소 | 기준 |
+| --- | --- |
+| StockRhythm 로고/타이틀 | 화면에서 가장 먼저 보이게 함 |
+| 부제 | 가상 차트 리듬 게임임을 짧게 설명 |
+| Start 버튼 | 가장 강조할 버튼 |
+| Quit 버튼 | 게임 종료 |
+| Settings 버튼 | 일반 옵션 진입 |
+| Sync/Offset 진입 | 리듬게임 보정 옵션 진입 |
+| 안전 문구 | PROFIT은 실제 수익이 아닌 게임 점수임을 고지 |
+| Version 표기 | 내부 테스트 빌드 확인용 |
+| 배경 비주얼 | 어두운 차트/캔들 실루엣 |
+| Animated Chart Motif | 은은한 차트 움직임 |
+
+Title에서 주의할 요소:
+
+| 요소 | 이유 |
+| --- | --- |
+| 실제 종목 코드 | 실제 금융 정보 오해 방지 |
+| 실제 가격/수익률 | 실제 투자 서비스처럼 보일 위험 |
+| 과도한 거래창 정보 | 첫 화면이 복잡해질 위험 |
+| Stage Preview | Stage Brief 화면에서 다룸 |
+
 ### Stage Brief
 
 | 항목 | 기준 |
@@ -76,6 +100,21 @@ StockRhythm MVP의 화면 디자인 양식을 정리한다.
 | 정보 | Drop / Rebound / Switch 같은 짧은 키워드 |
 | 버튼 | Play 강조 |
 | 장식 | 가상 종목 카드처럼 구성 가능 |
+
+Stage Brief 채택 요소:
+
+| 요소 | 기준 |
+| --- | --- |
+| Stage Name | `SAMSU`를 명확히 표시 |
+| Stage Subtitle | 전자/제조풍 가상 종목 분위기 전달 |
+| Mood Keywords | Drop / Rebound / Switch |
+| Short Description | 짧은 한두 문장 |
+| Play Button | 가장 강조 |
+| Back Button | Title 복귀 |
+| Safety Text | 실제 투자/실제 종목 아님 고지 |
+| Mini Chart Preview | 가상 차트 실루엣 |
+| Difficulty Hint | 간단한 체감 난이도 |
+| Length Hint | 30초 내외 등 길이 안내 |
 
 ### Tutorial Overlay
 

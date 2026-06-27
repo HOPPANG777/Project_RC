@@ -13,7 +13,7 @@
 | `STOCK_RHYTHM_CONCEPT_UPDATE.md` | `Ideas/StockRhythm/STOCK_RHYTHM_CONCEPT_UPDATE.md` | 복사 완료 |
 | `Stock Rhythm 컨셉 기획서.docx` | `ProjectDirectAsset/StockRhythm/Stock Rhythm 컨셉 기획서.docx` | 복사 완료 |
 | `CONCEPT_IMAGES.md` | `ProjectDirectAsset/StockRhythm/CONCEPT_IMAGES.md` | 복사 완료 |
-| `PROJECT_UPDATE_LOG.md` | `UpdateLog/StockRhythm/PROJECT_UPDATE_LOG.md` | 복사 완료 |
+| `PROJECT_UPDATE_LOG.md` | `UpdateLog/StockRhythm/PROJECT_UPDATE_LOG.md` | 통합 기준 로그로 갱신 |
 
 ## 콘셉트 이미지
 
@@ -63,8 +63,8 @@
 | `Ideas/StockRhythm/STOCK_RHYTHM_NEXT_PLANNING_ITEMS.md` | 추가 진행 기획안 목록 |
 | `Ideas/StockRhythm/STOCK_RHYTHM_PLAY_FLOW_UIUX.md` | 플레이 흐름과 UI/UX 화면 구성 |
 | `Ideas/StockRhythm/STOCK_RHYTHM_DESIGN_GUIDE.md` | MVP 디자인 양식과 화면 톤 기준 |
+| `Ideas/StockRhythm/STOCK_RHYTHM_SCENE_ELEMENT_LIST.md` | 씬별 후보 요소 목록 |
 | `ProjectDirectAsset/StockRhythm/README.md` | 자산 폴더 안내 |
 | `ProjectDirectAsset/StockRhythm/ASSET_MANIFEST.md` | 콘셉트 이미지와 추가 필요 자산 목록 |
 | `UpdateLog/StockRhythm/README.md` | 로그 폴더 안내 |
-| `UpdateLog/StockRhythm/STOCK_RHYTHM_DIRECTING_MIGRATION_LOG.md` | Directing_Files 이관 로그 |
-| `UpdateLog/StockRhythm/STOCK_RHYTHM_MVP_DECISION_LOG.md` | MVP 확정 사항 기록 |
+| `UpdateLog/StockRhythm/PROJECT_UPDATE_LOG.md` | StockRhythm 단일 업데이트 로그 |

@@ -12,6 +12,9 @@
 - `STOCK_RHYTHM_DIRECTION_BRIEF.md`: 현재 적용할 게임 방향성 요약
 - `STOCK_RHYTHM_MVP_TASKS.md`: MVP 제작 진행용 체크리스트
 - `STOCK_RHYTHM_SAMSU_MVP_SPEC.md`: SAMSU 기준 MVP 판정/점수 사양
+- `STOCK_RHYTHM_NEXT_PLANNING_ITEMS.md`: 추가로 진행해야 할 기획안 목록
+- `STOCK_RHYTHM_PLAY_FLOW_UIUX.md`: 플레이 흐름과 UI/UX 화면 구성
+- `STOCK_RHYTHM_DESIGN_GUIDE.md`: MVP 디자인 양식과 화면 톤 기준
 
 ## 사용 기준
 

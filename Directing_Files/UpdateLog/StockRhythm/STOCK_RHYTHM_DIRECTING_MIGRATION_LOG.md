@@ -22,6 +22,8 @@
 | 색인 제작 | `Directing_Files/README.md`, `STOCKRHYTHM_FILE_INVENTORY.md` |
 | 진행 문서 제작 | 방향성 요약, MVP 작업표, 자산 매니페스트 |
 | MVP 기준 갱신 | `SAMSU` 기준 판정/점수 사양과 결정 로그 추가 |
+| Unity 기준 갱신 | Unity 개발 확정은 유지하되 직접 구현 내용은 개발자 결정 영역으로 분리 |
+| 추가 기획안 정리 | 실제 패턴 제작을 후순위로 두고 플레이 플로우, UI/UX 화면 구성, 디자인 양식을 우선 정리 |
 
 ## 새로 만든 관리 파일
 
@@ -33,6 +35,9 @@
 | `Ideas/StockRhythm/STOCK_RHYTHM_DIRECTION_BRIEF.md` | 현재 적용할 제작 방향 |
 | `Ideas/StockRhythm/STOCK_RHYTHM_MVP_TASKS.md` | 다음 제작 작업표 |
 | `Ideas/StockRhythm/STOCK_RHYTHM_SAMSU_MVP_SPEC.md` | SAMSU 기준 MVP 판정/점수 사양 |
+| `Ideas/StockRhythm/STOCK_RHYTHM_NEXT_PLANNING_ITEMS.md` | 추가 진행 기획안 목록 |
+| `Ideas/StockRhythm/STOCK_RHYTHM_PLAY_FLOW_UIUX.md` | 플레이 흐름과 UI/UX 화면 구성 |
+| `Ideas/StockRhythm/STOCK_RHYTHM_DESIGN_GUIDE.md` | MVP 디자인 양식과 화면 톤 기준 |
 | `ProjectDirectAsset/StockRhythm/README.md` | 자산 폴더 안내 |
 | `ProjectDirectAsset/StockRhythm/ASSET_MANIFEST.md` | 이미지와 추가 필요 자산 목록 |
 | `UpdateLog/StockRhythm/README.md` | 로그 폴더 안내 |
@@ -41,6 +46,6 @@
 
 ## 후속 작업
 
-1. 패턴표 데이터 타입 구조를 확정한다.
-2. `SAMSU` 30초 기준 샘플 패턴을 작성한다.
-3. Unity 구현이 시작되면 `Directing_Files`와 실제 구현 변경 로그를 분리해 기록한다.
+1. Gameplay 화면 정보 우선순위와 디자인 톤을 확정한다.
+2. Result 화면과 Tutorial Overlay 문구를 확정한다.
+3. 실제 패턴표 제작은 후순위로 진행한다.

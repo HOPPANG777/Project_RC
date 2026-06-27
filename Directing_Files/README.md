@@ -26,6 +26,9 @@
 - `Ideas/StockRhythm/STOCK_RHYTHM_DIRECTION_BRIEF.md`: 현재 적용할 핵심 방향
 - `Ideas/StockRhythm/STOCK_RHYTHM_MVP_TASKS.md`: 다음 제작 단계 체크리스트
 - `Ideas/StockRhythm/STOCK_RHYTHM_SAMSU_MVP_SPEC.md`: SAMSU 기준 MVP 판정/점수 사양
+- `Ideas/StockRhythm/STOCK_RHYTHM_NEXT_PLANNING_ITEMS.md`: 추가 진행 기획안 목록
+- `Ideas/StockRhythm/STOCK_RHYTHM_PLAY_FLOW_UIUX.md`: 플레이 흐름과 UI/UX 화면 구성
+- `Ideas/StockRhythm/STOCK_RHYTHM_DESIGN_GUIDE.md`: MVP 디자인 양식과 화면 톤 기준
 - `ProjectDirectAsset/StockRhythm/ASSET_MANIFEST.md`: 콘셉트 이미지 자산 목록
 - `UpdateLog/StockRhythm/STOCK_RHYTHM_DIRECTING_MIGRATION_LOG.md`: 이번 이관 작업 로그
 - `UpdateLog/StockRhythm/STOCK_RHYTHM_MVP_DECISION_LOG.md`: MVP 확정 사항 기록

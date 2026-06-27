@@ -60,6 +60,9 @@
 | `Ideas/StockRhythm/STOCK_RHYTHM_DIRECTION_BRIEF.md` | 현재 적용할 제작 방향 |
 | `Ideas/StockRhythm/STOCK_RHYTHM_MVP_TASKS.md` | MVP 제작 체크리스트 |
 | `Ideas/StockRhythm/STOCK_RHYTHM_SAMSU_MVP_SPEC.md` | SAMSU 기준 MVP 판정/점수 사양 |
+| `Ideas/StockRhythm/STOCK_RHYTHM_NEXT_PLANNING_ITEMS.md` | 추가 진행 기획안 목록 |
+| `Ideas/StockRhythm/STOCK_RHYTHM_PLAY_FLOW_UIUX.md` | 플레이 흐름과 UI/UX 화면 구성 |
+| `Ideas/StockRhythm/STOCK_RHYTHM_DESIGN_GUIDE.md` | MVP 디자인 양식과 화면 톤 기준 |
 | `ProjectDirectAsset/StockRhythm/README.md` | 자산 폴더 안내 |
 | `ProjectDirectAsset/StockRhythm/ASSET_MANIFEST.md` | 콘셉트 이미지와 추가 필요 자산 목록 |
 | `UpdateLog/StockRhythm/README.md` | 로그 폴더 안내 |

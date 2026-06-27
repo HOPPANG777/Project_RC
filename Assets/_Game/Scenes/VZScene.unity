@@ -255,11 +255,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ChartRunController
   _runnerTransform: {fileID: 245956007}
+  _musicAudioSource: {fileID: 0}
   _startX: 0
   _runnerY: 0
   _nodeInterval: 0.1
   _unitsPerNode: 1
   _stageDuration: 30
+  _dspStartDelay: 0.1
+  _controlMusicAudioSource: 1
 --- !u!1 &2029174207
 GameObject:
   m_ObjectHideFlags: 0

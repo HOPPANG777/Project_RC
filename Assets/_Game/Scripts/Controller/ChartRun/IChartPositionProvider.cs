@@ -11,6 +11,12 @@ public interface IChartPositionProvider
     /// <summary>캔들/노드 하나가 차지하는 시간 간격입니다.</summary>
     float NodeInterval { get; }
 
+    /// <summary>현재 Unity 오디오 DSP 시간입니다.</summary>
+    double CurrentDspTime { get; }
+
+    /// <summary>현재 러닝이 시작된 오디오 DSP 시간입니다.</summary>
+    double RunStartDspTime { get; }
+
     /// <summary>현재 스테이지 진행 시간입니다.</summary>
     float CurrentTime { get; }
 
@@ -37,4 +43,13 @@ public interface IChartPositionProvider
     /// <param name="time">계산할 시간입니다.</param>
     /// <returns>해당 시간의 캔들/노드 인덱스입니다.</returns>
     int GetNodeIndexAtTime(float time);
+
+    /// <summary>현재 오디오 DSP 시간을 기준으로 스테이지 진행 시간을 계산합니다.</summary>
+    /// <returns>현재 스테이지 진행 시간입니다.</returns>
+    float GetCurrentRunTime();
+
+    /// <summary>특정 오디오 DSP 시간에 해당하는 스테이지 진행 시간을 계산합니다.</summary>
+    /// <param name="dspTime">계산할 오디오 DSP 시간입니다.</param>
+    /// <returns>해당 DSP 시간의 스테이지 진행 시간입니다.</returns>
+    float GetRunTimeAtDspTime(double dspTime);
 }

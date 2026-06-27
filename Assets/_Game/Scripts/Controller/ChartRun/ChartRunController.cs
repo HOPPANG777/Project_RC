@@ -27,6 +27,9 @@ public class ChartRunController : MonoBehaviour, IChartRunService
     // 시간에서 X 위치로 변환할 때 0 나누기를 막기 위한 최소 노드 거리입니다.
     private const float MIN_UNITS_PER_NODE = 0.01f;
 
+    // 오디오 DSP 예약 시작 지연의 최소값입니다.
+    private const float MIN_DSP_START_DELAY = 0.0f;
+
     //==============================================================================
     // 직렬화 필드
     //==============================================================================
@@ -36,6 +39,11 @@ public class ChartRunController : MonoBehaviour, IChartRunService
     [Required]
     [SerializeField]
     private Transform _runnerTransform;
+
+    [TabGroup("Refs")]
+    [Tooltip("차트 러닝과 동기화할 음악 AudioSource입니다. 없으면 DSP 시간만 기준으로 진행합니다.")]
+    [SerializeField]
+    private AudioSource _musicAudioSource;
 
     [TabGroup("Settings")]
     [Tooltip("스테이지가 시작되는 월드 X 위치입니다.")]
@@ -65,6 +73,17 @@ public class ChartRunController : MonoBehaviour, IChartRunService
     [SerializeField]
     private float _stageDuration = 30.0f;
 
+    [TabGroup("Settings")]
+    [Tooltip("AudioSettings.dspTime 기준으로 시작을 예약할 지연 시간입니다.")]
+    [MinValue(MIN_DSP_START_DELAY)]
+    [SerializeField]
+    private float _dspStartDelay = 0.1f;
+
+    [TabGroup("Settings")]
+    [Tooltip("러닝 시작/일시정지/정지 시 연결된 AudioSource도 함께 제어할지 여부입니다.")]
+    [SerializeField]
+    private bool _controlMusicAudioSource = true;
+
     //==============================================================================
     // 내부 상태
     //==============================================================================
@@ -78,6 +97,9 @@ public class ChartRunController : MonoBehaviour, IChartRunService
     // 현재 스테이지가 일시정지 상태인지 여부입니다.
     private bool _isPaused;
 
+    // DSP 예약 시작 전 대기 중인지 여부입니다.
+    private bool _isWaitingForDspStart;
+
     // 현재 스테이지 진행 시간입니다.
     private float _currentTime;
 
@@ -86,6 +108,15 @@ public class ChartRunController : MonoBehaviour, IChartRunService
 
     // 현재 0.1초 기준 캔들/노드 인덱스입니다.
     private int _currentNodeIndex;
+
+    // 차트 러닝이 시작되도록 예약된 Unity 오디오 DSP 시간입니다.
+    private double _runStartDspTime;
+
+    // 일시정지를 시작한 Unity 오디오 DSP 시간입니다.
+    private double _pauseStartDspTime;
+
+    // 누적 일시정지 시간을 DSP 시간 기준으로 기록한 값입니다.
+    private double _totalPausedDspDuration;
 
     //==============================================================================
     // 프로퍼티
@@ -112,6 +143,13 @@ public class ChartRunController : MonoBehaviour, IChartRunService
     [LabelText("일시정지")]
     public bool IsPaused => _isPaused;
 
+    /// <summary>DSP 예약 시작 전 대기 중인지 여부입니다.</summary>
+    [TabGroup("Runtime")]
+    [ShowInInspector]
+    [ReadOnly]
+    [LabelText("DSP 시작 대기")]
+    private bool IsWaitingForDspStart => _isWaitingForDspStart;
+
     /// <summary>스테이지 전체 진행 시간입니다.</summary>
     [TabGroup("Runtime")]
     [ShowInInspector]
@@ -126,12 +164,33 @@ public class ChartRunController : MonoBehaviour, IChartRunService
     [LabelText("노드 시간 간격")]
     public float NodeInterval => _nodeInterval;
 
+    /// <summary>현재 Unity 오디오 DSP 시간입니다.</summary>
+    [TabGroup("Runtime")]
+    [ShowInInspector]
+    [ReadOnly]
+    [LabelText("현재 DSP 시간")]
+    public double CurrentDspTime => AudioSettings.dspTime;
+
+    /// <summary>현재 러닝이 시작된 오디오 DSP 시간입니다.</summary>
+    [TabGroup("Runtime")]
+    [ShowInInspector]
+    [ReadOnly]
+    [LabelText("러닝 시작 DSP 시간")]
+    public double RunStartDspTime => _runStartDspTime;
+
     /// <summary>현재 스테이지 진행 시간입니다.</summary>
     [TabGroup("Runtime")]
     [ShowInInspector]
     [ReadOnly]
     [LabelText("현재 시간")]
     public float CurrentTime => _currentTime;
+
+    /// <summary>DSP 시간으로 즉시 계산한 현재 스테이지 진행 시간입니다.</summary>
+    [TabGroup("Runtime")]
+    [ShowInInspector]
+    [ReadOnly]
+    [LabelText("DSP 기준 현재 시간")]
+    private float DspCurrentTime => GetCurrentRunTime();
 
     /// <summary>현재 플레이어 기준점의 차트 X 위치입니다.</summary>
     [TabGroup("Runtime")]
@@ -201,7 +260,7 @@ public class ChartRunController : MonoBehaviour, IChartRunService
             return;
         }
 
-        AdvanceRun(Time.deltaTime);
+        SyncRunTimeFromDsp();
     }
 
     /// <summary>인스펙터 값이 바뀔 때 잘못된 설정값을 보정합니다.</summary>
@@ -236,16 +295,24 @@ public class ChartRunController : MonoBehaviour, IChartRunService
             Init();
         }
 
+        if (_isRunning)
+        {
+            LogWarning("이미 차트 러닝이 진행 중입니다.");
+            return false;
+        }
+
         if (CanRun() == false)
         {
             return false;
         }
 
         _currentTime = 0.0f;
+        PrepareDspStart();
         _isRunning = true;
         _isPaused = false;
 
         RefreshRunPosition();
+        PlayMusicSourceScheduled();
         return true;
     }
 
@@ -262,7 +329,10 @@ public class ChartRunController : MonoBehaviour, IChartRunService
             return;
         }
 
+        SyncRunTimeFromDsp();
+        _pauseStartDspTime = AudioSettings.dspTime;
         _isPaused = true;
+        PauseMusicSource();
     }
 
     /// <summary>일시정지된 차트 러닝을 재개합니다.</summary>
@@ -278,12 +348,23 @@ public class ChartRunController : MonoBehaviour, IChartRunService
             return;
         }
 
+        double currentDspTime = AudioSettings.dspTime;
+        double pausedDuration = currentDspTime - _pauseStartDspTime;
+
+        if (pausedDuration > 0.0d)
+        {
+            _totalPausedDspDuration += pausedDuration;
+        }
+
+        _pauseStartDspTime = 0.0d;
         _isPaused = false;
+        ResumeMusicSource();
     }
 
     /// <summary>차트 러닝을 중지하고 시작 위치로 되돌립니다.</summary>
     public void Stop()
     {
+        StopMusicSource();
         ResetRunState();
     }
 
@@ -321,6 +402,45 @@ public class ChartRunController : MonoBehaviour, IChartRunService
         return Mathf.Clamp(nodeIndex, 0, maxNodeIndex);
     }
 
+    /// <summary>현재 오디오 DSP 시간을 기준으로 스테이지 진행 시간을 계산합니다.</summary>
+    /// <returns>현재 스테이지 진행 시간입니다.</returns>
+    public float GetCurrentRunTime()
+    {
+        return GetRunTimeAtDspTime(AudioSettings.dspTime);
+    }
+
+    /// <summary>특정 오디오 DSP 시간에 해당하는 스테이지 진행 시간을 계산합니다.</summary>
+    /// <param name="dspTime">계산할 오디오 DSP 시간입니다.</param>
+    /// <returns>해당 DSP 시간의 스테이지 진행 시간입니다.</returns>
+    public float GetRunTimeAtDspTime(double dspTime)
+    {
+        if (_isRunning == false)
+        {
+            return _currentTime;
+        }
+
+        if (_runStartDspTime <= 0.0d)
+        {
+            return _currentTime;
+        }
+
+        double pausedDuration = _totalPausedDspDuration;
+
+        if (_isPaused && dspTime > _pauseStartDspTime)
+        {
+            pausedDuration += dspTime - _pauseStartDspTime;
+        }
+
+        double rawRunTime = dspTime - _runStartDspTime - pausedDuration;
+
+        if (rawRunTime <= 0.0d)
+        {
+            return 0.0f;
+        }
+
+        return Mathf.Clamp((float)rawRunTime, 0.0f, _stageDuration);
+    }
+
     //==============================================================================
     // 공개 API (테스트 / 편의)
     //==============================================================================
@@ -341,7 +461,9 @@ public class ChartRunController : MonoBehaviour, IChartRunService
         }
 
         _currentTime = Mathf.Clamp(time, 0.0f, _stageDuration);
+        RebaseDspStartToCurrentTime();
         RefreshRunPosition();
+        SyncMusicSourceToCurrentTime();
         return true;
     }
 
@@ -371,6 +493,7 @@ public class ChartRunController : MonoBehaviour, IChartRunService
         _stageDuration = GetSafePositiveValue(_stageDuration, 30.0f, MIN_STAGE_DURATION);
         _nodeInterval = GetSafePositiveValue(_nodeInterval, 0.1f, MIN_NODE_INTERVAL);
         _unitsPerNode = GetSafePositiveValue(_unitsPerNode, 1.0f, MIN_UNITS_PER_NODE);
+        _dspStartDelay = GetSafeNonNegativeValue(_dspStartDelay, 0.1f);
     }
 
     /// <summary>러닝 상태를 초기값으로 되돌리고 러너를 시작 위치에 배치합니다.</summary>
@@ -378,21 +501,20 @@ public class ChartRunController : MonoBehaviour, IChartRunService
     {
         _isRunning = false;
         _isPaused = false;
+        _isWaitingForDspStart = false;
         _currentTime = 0.0f;
+        _runStartDspTime = 0.0d;
+        _pauseStartDspTime = 0.0d;
+        _totalPausedDspDuration = 0.0d;
 
         RefreshRunPosition();
     }
 
-    /// <summary>한 프레임만큼 진행 시간을 갱신합니다.</summary>
-    /// <param name="deltaTime">이번 프레임의 경과 시간입니다.</param>
-    private void AdvanceRun(float deltaTime)
+    /// <summary>오디오 DSP 시간을 기준으로 현재 러닝 시간을 동기화합니다.</summary>
+    private void SyncRunTimeFromDsp()
     {
-        if (deltaTime <= 0.0f)
-        {
-            return;
-        }
-
-        _currentTime += deltaTime;
+        _currentTime = GetCurrentRunTime();
+        _isWaitingForDspStart = AudioSettings.dspTime < _runStartDspTime;
 
         if (_currentTime >= _stageDuration)
         {
@@ -410,6 +532,28 @@ public class ChartRunController : MonoBehaviour, IChartRunService
     {
         _isRunning = false;
         _isPaused = false;
+        _isWaitingForDspStart = false;
+        StopMusicSource();
+    }
+
+    /// <summary>현재 DSP 시간을 기준으로 차트 러닝 시작 시간을 예약합니다.</summary>
+    private void PrepareDspStart()
+    {
+        _runStartDspTime = AudioSettings.dspTime + _dspStartDelay;
+        _pauseStartDspTime = 0.0d;
+        _totalPausedDspDuration = 0.0d;
+        _isWaitingForDspStart = _dspStartDelay > 0.0f;
+    }
+
+    /// <summary>현재 스테이지 시간에 맞춰 DSP 시작 기준점을 다시 계산합니다.</summary>
+    private void RebaseDspStartToCurrentTime()
+    {
+        double currentDspTime = AudioSettings.dspTime;
+
+        _runStartDspTime = currentDspTime - _currentTime;
+        _pauseStartDspTime = _isPaused ? currentDspTime : 0.0d;
+        _totalPausedDspDuration = 0.0d;
+        _isWaitingForDspStart = false;
     }
 
     /// <summary>현재 시간 기준으로 X 위치와 노드 인덱스를 갱신합니다.</summary>
@@ -467,6 +611,90 @@ public class ChartRunController : MonoBehaviour, IChartRunService
         return true;
     }
 
+    /// <summary>연결된 음악 AudioSource를 DSP 시작 시간에 맞춰 예약 재생합니다.</summary>
+    private void PlayMusicSourceScheduled()
+    {
+        if (CanControlMusicSource() == false)
+        {
+            return;
+        }
+
+        _musicAudioSource.Stop();
+        _musicAudioSource.time = 0.0f;
+        _musicAudioSource.PlayScheduled(_runStartDspTime);
+    }
+
+    /// <summary>연결된 음악 AudioSource를 일시정지합니다.</summary>
+    private void PauseMusicSource()
+    {
+        if (CanControlMusicSource() == false)
+        {
+            return;
+        }
+
+        _musicAudioSource.Pause();
+    }
+
+    /// <summary>연결된 음악 AudioSource를 재개합니다.</summary>
+    private void ResumeMusicSource()
+    {
+        if (CanControlMusicSource() == false)
+        {
+            return;
+        }
+
+        _musicAudioSource.UnPause();
+    }
+
+    /// <summary>연결된 음악 AudioSource를 정지합니다.</summary>
+    private void StopMusicSource()
+    {
+        if (CanControlMusicSource() == false)
+        {
+            return;
+        }
+
+        _musicAudioSource.Stop();
+    }
+
+    /// <summary>연결된 음악 AudioSource의 재생 위치를 현재 스테이지 시간에 맞춥니다.</summary>
+    private void SyncMusicSourceToCurrentTime()
+    {
+        if (CanControlMusicSource() == false)
+        {
+            return;
+        }
+
+        _musicAudioSource.time = _currentTime;
+
+        if (_isRunning && _isPaused == false)
+        {
+            _musicAudioSource.Play();
+        }
+    }
+
+    /// <summary>음악 AudioSource를 이 컨트롤러가 제어할 수 있는지 확인합니다.</summary>
+    /// <returns>제어 가능한 상태이면 true입니다.</returns>
+    private bool CanControlMusicSource()
+    {
+        if (_controlMusicAudioSource == false)
+        {
+            return false;
+        }
+
+        if (_musicAudioSource == null)
+        {
+            return false;
+        }
+
+        if (_musicAudioSource.clip == null)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
     /// <summary>양수여야 하는 설정값을 안전하게 보정합니다.</summary>
     /// <param name="value">검증할 원본 값입니다.</param>
     /// <param name="fallback">잘못된 값일 때 사용할 대체 값입니다.</param>
@@ -485,6 +713,25 @@ public class ChartRunController : MonoBehaviour, IChartRunService
         }
 
         return Mathf.Max(value, minimum);
+    }
+
+    /// <summary>0 이상이어야 하는 설정값을 안전하게 보정합니다.</summary>
+    /// <param name="value">검증할 원본 값입니다.</param>
+    /// <param name="fallback">잘못된 값일 때 사용할 대체 값입니다.</param>
+    /// <returns>보정된 0 이상의 값입니다.</returns>
+    private static float GetSafeNonNegativeValue(float value, float fallback)
+    {
+        if (float.IsNaN(value))
+        {
+            return fallback;
+        }
+
+        if (float.IsInfinity(value))
+        {
+            return fallback;
+        }
+
+        return Mathf.Max(value, 0.0f);
     }
 
     /// <summary>에디터와 개발 빌드에서만 출력되는 경고 로그입니다.</summary>

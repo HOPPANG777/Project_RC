@@ -24,12 +24,21 @@ public class GameRoot : Singleton<GameRoot>
     [SerializeField]
     private ChartRunController _chartRunController;
 
+    [TabGroup("Controller")]
+    [Tooltip("스테이지 데이터를 읽어 차트 노트의 월드 배치 캐시를 생성하는 컨트롤러입니다.")]
+    [Required]
+    [SerializeField]
+    private ChartStageController _chartStageController;
+
     //==============================================================================
     // 프로퍼티
     //==============================================================================
 
     /// <summary>가로 차트 러닝 시스템의 외부 공개 계약입니다.</summary>
     public IChartRunService ChartRun => _chartRunController;
+
+    /// <summary>차트 스테이지 배치 캐시 시스템의 외부 공개 계약입니다.</summary>
+    public IChartStageService ChartStage => _chartStageController;
 
     //==============================================================================
     // 유니티 생명주기
@@ -55,5 +64,13 @@ public class GameRoot : Singleton<GameRoot>
         }
 
         _chartRunController.Init();
+
+        if (_chartStageController == null)
+        {
+            Debug.LogWarning("[GameRoot] ChartStageController가 연결되지 않았습니다.");
+            return;
+        }
+
+        _chartStageController.Init(_chartRunController);
     }
 }

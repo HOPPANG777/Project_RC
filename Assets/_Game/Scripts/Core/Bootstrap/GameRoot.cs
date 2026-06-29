@@ -30,6 +30,18 @@ public class GameRoot : Singleton<GameRoot>
     [SerializeField]
     private ChartStageController _chartStageController;
 
+    [TabGroup("Controller")]
+    [Tooltip("Left Shift / Right Shift 입력을 DSP 기준 BUY / SELL 이벤트로 수집하는 컨트롤러입니다.")]
+    [Required]
+    [SerializeField]
+    private ChartInputController _chartInputController;
+
+    [TabGroup("Controller")]
+    [Tooltip("BUY / SELL 입력과 차트 노트를 비교해 판정 결과를 생성하는 컨트롤러입니다.")]
+    [Required]
+    [SerializeField]
+    private ChartJudgementController _chartJudgementController;
+
     //==============================================================================
     // 프로퍼티
     //==============================================================================
@@ -39,6 +51,12 @@ public class GameRoot : Singleton<GameRoot>
 
     /// <summary>차트 스테이지 배치 캐시 시스템의 외부 공개 계약입니다.</summary>
     public IChartStageService ChartStage => _chartStageController;
+
+    /// <summary>BUY / SELL 입력 수집 시스템의 외부 공개 계약입니다.</summary>
+    public IChartInputService ChartInput => _chartInputController;
+
+    /// <summary>차트 노트 판정 시스템의 외부 공개 계약입니다.</summary>
+    public IChartJudgementService ChartJudgement => _chartJudgementController;
 
     //==============================================================================
     // 유니티 생명주기
@@ -72,5 +90,24 @@ public class GameRoot : Singleton<GameRoot>
         }
 
         _chartStageController.Init(_chartRunController);
+
+        if (_chartInputController == null)
+        {
+            Debug.LogWarning("[GameRoot] ChartInputController가 연결되지 않았습니다.");
+            return;
+        }
+
+        _chartInputController.Init(_chartRunController);
+
+        if (_chartJudgementController == null)
+        {
+            Debug.LogWarning("[GameRoot] ChartJudgementController가 연결되지 않았습니다.");
+            return;
+        }
+
+        _chartJudgementController.Init(
+            _chartInputController,
+            _chartStageController,
+            _chartRunController);
     }
 }

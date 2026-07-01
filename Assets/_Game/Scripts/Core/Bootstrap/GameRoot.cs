@@ -9,7 +9,7 @@ using UnityEngine;
 // 세부 구현 사항
 // - 프로젝트 내 유일한 싱글턴입니다.
 // - 각 컨트롤러는 직렬화 필드로 보관하고 외부에는 인터페이스로만 공개합니다.
-// - 컨트롤러 초기화는 Start 단계에서 명시적으로 호출합니다.
+// - 컨트롤러와 선택 Presenter 초기화는 Start 단계에서 명시적으로 호출합니다.
 //==============================================================================
 
 public class GameRoot : Singleton<GameRoot>
@@ -42,6 +42,22 @@ public class GameRoot : Singleton<GameRoot>
     [SerializeField]
     private ChartJudgementController _chartJudgementController;
 
+    [TabGroup("Controller")]
+    [Tooltip("스테이지 준비 확인부터 차트 러닝 시작까지의 한 판 시작 흐름을 관리하는 컨트롤러입니다.")]
+    [Required]
+    [SerializeField]
+    private ChartPlayController _chartPlayController;
+
+    [TabGroup("Presenter")]
+    [Tooltip("ChartRun CurrentX를 따라 카메라 또는 플레이 표면 루트를 이동시키는 Presenter입니다.")]
+    [SerializeField]
+    private ChartCameraFollowPresenter _chartCameraFollowPresenter;
+
+    [TabGroup("Presenter")]
+    [Tooltip("ChartStage 배치 캐시를 Gameplay 플레이 표면 View에 표시하는 Presenter입니다.")]
+    [SerializeField]
+    private ChartPlaySurfacePresenter _chartPlaySurfacePresenter;
+
     //==============================================================================
     // 프로퍼티
     //==============================================================================
@@ -57,6 +73,9 @@ public class GameRoot : Singleton<GameRoot>
 
     /// <summary>차트 노트 판정 시스템의 외부 공개 계약입니다.</summary>
     public IChartJudgementService ChartJudgement => _chartJudgementController;
+
+    /// <summary>차트 플레이 시작 흐름의 외부 공개 계약입니다.</summary>
+    public IChartPlayService ChartPlay => _chartPlayController;
 
     //==============================================================================
     // 유니티 생명주기
@@ -82,6 +101,7 @@ public class GameRoot : Singleton<GameRoot>
         }
 
         _chartRunController.Init();
+        InitChartCameraFollowPresenter();
 
         if (_chartStageController == null)
         {
@@ -90,6 +110,7 @@ public class GameRoot : Singleton<GameRoot>
         }
 
         _chartStageController.Init(_chartRunController);
+        InitChartPlaySurfacePresenter();
 
         if (_chartInputController == null)
         {
@@ -109,5 +130,39 @@ public class GameRoot : Singleton<GameRoot>
             _chartInputController,
             _chartStageController,
             _chartRunController);
+
+        if (_chartPlayController == null)
+        {
+            Debug.LogWarning("[GameRoot] ChartPlayController가 연결되지 않았습니다.");
+            return;
+        }
+
+        _chartPlayController.Init(
+            _chartStageController,
+            _chartInputController,
+            _chartJudgementController,
+            _chartRunController);
+    }
+
+    /// <summary>선택적으로 등록된 카메라 Follow Presenter를 초기화합니다.</summary>
+    private void InitChartCameraFollowPresenter()
+    {
+        if (_chartCameraFollowPresenter == null)
+        {
+            return;
+        }
+
+        _chartCameraFollowPresenter.Init(_chartRunController);
+    }
+
+    /// <summary>선택적으로 등록된 플레이 표면 Presenter를 초기화합니다.</summary>
+    private void InitChartPlaySurfacePresenter()
+    {
+        if (_chartPlaySurfacePresenter == null)
+        {
+            return;
+        }
+
+        _chartPlaySurfacePresenter.Init(_chartStageController);
     }
 }

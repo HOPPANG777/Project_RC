@@ -15,6 +15,15 @@ using UnityEngine;
 public class ChartPlayController : MonoBehaviour, IChartPlayService
 {
     //==============================================================================
+    // 직렬화 필드
+    //==============================================================================
+
+    [TabGroup("Settings")]
+    [Tooltip("GameRoot 초기화가 끝나면 바로 스테이지 플레이를 시작할지 여부입니다.")]
+    [SerializeField]
+    private bool _autoStartOnInit = true;
+
+    //==============================================================================
     // 내부 상태
     //==============================================================================
 
@@ -75,6 +84,11 @@ public class ChartPlayController : MonoBehaviour, IChartPlayService
 
         _isInitialized = true;
         LogMissingDependencies();
+
+        if (_autoStartOnInit)
+        {
+            TryStartPlay();
+        }
     }
 
     //==============================================================================

@@ -42,6 +42,20 @@ public class ChartNoteView : MonoBehaviour, IChartNoteView
     // 기본 종가 범위 높이입니다.
     private const float DEFAULT_CLOSE_RANGE_HEIGHT = 0.12f;
 
+    // 자동 구성할 캔들 파트 이름입니다.
+    private const string BODY_PART_NAME = "Body";
+    private const string WICK_PART_NAME = "Wick";
+    private const string CLOSE_RANGE_PART_NAME = "CloseRange";
+
+    // 캔들 파트가 판정선보다 뒤에 보이도록 사용하는 기본 정렬 순서입니다.
+    private const int WICK_SORTING_ORDER = 10;
+    private const int BODY_SORTING_ORDER = 11;
+    private const int CLOSE_RANGE_SORTING_ORDER = 12;
+
+    // 프로젝트에 표시용 스프라이트가 없을 때 런타임에서 만드는 1x1 흰 사각형입니다.
+    private static Texture2D _fallbackTexture;
+    private static Sprite _fallbackSprite;
+
     //==============================================================================
     // 직렬화 필드
     //==============================================================================
@@ -415,6 +429,106 @@ public class ChartNoteView : MonoBehaviour, IChartNoteView
         {
             _bodyTransform = _bodyRenderer.transform;
         }
+
+        if (_bodyRenderer == null)
+        {
+            _bodyRenderer = FindOrCreateSpritePart(BODY_PART_NAME, BODY_SORTING_ORDER);
+            _bodyTransform = _bodyRenderer.transform;
+        }
+
+        if (_wickRenderer == null)
+        {
+            _wickRenderer = FindOrCreateSpritePart(WICK_PART_NAME, WICK_SORTING_ORDER);
+            _wickTransform = _wickRenderer.transform;
+        }
+
+        if (_wickTransform == null && _wickRenderer != null)
+        {
+            _wickTransform = _wickRenderer.transform;
+        }
+
+        if (_closeRangeRenderer == null)
+        {
+            _closeRangeRenderer = FindOrCreateSpritePart(CLOSE_RANGE_PART_NAME, CLOSE_RANGE_SORTING_ORDER);
+            _closeRangeTransform = _closeRangeRenderer.transform;
+        }
+
+        if (_closeRangeTransform == null && _closeRangeRenderer != null)
+        {
+            _closeRangeTransform = _closeRangeRenderer.transform;
+        }
+    }
+
+    /// <summary>지정한 이름의 캔들 파트를 찾거나 새로 만들어 SpriteRenderer를 반환합니다.</summary>
+    private SpriteRenderer FindOrCreateSpritePart(string partName, int sortingOrder)
+    {
+        Transform partTransform = transform.Find(partName);
+
+        if (partTransform == null)
+        {
+            GameObject partObject = new GameObject(partName);
+            partTransform = partObject.transform;
+            partTransform.SetParent(transform, false);
+        }
+
+        partTransform.localPosition = Vector3.zero;
+        partTransform.localRotation = Quaternion.identity;
+        partTransform.localScale = Vector3.one;
+
+        SpriteRenderer spriteRenderer = partTransform.GetComponent<SpriteRenderer>();
+
+        if (spriteRenderer == null)
+        {
+            spriteRenderer = partTransform.gameObject.AddComponent<SpriteRenderer>();
+        }
+
+        if (spriteRenderer.sprite == null)
+        {
+            spriteRenderer.sprite = GetFallbackSprite();
+        }
+
+        spriteRenderer.sortingOrder = sortingOrder;
+        return spriteRenderer;
+    }
+
+    /// <summary>별도 에셋 없이 캔들 파트를 표시하기 위한 기본 흰 사각형 스프라이트를 반환합니다.</summary>
+    private static Sprite GetFallbackSprite()
+    {
+#if UNITY_EDITOR
+        Sprite editorSprite = UnityEditor.AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
+
+        if (editorSprite != null)
+        {
+            return editorSprite;
+        }
+#endif
+
+        if (_fallbackSprite != null)
+        {
+            return _fallbackSprite;
+        }
+
+        if (_fallbackTexture == null)
+        {
+            _fallbackTexture = new Texture2D(1, 1, TextureFormat.RGBA32, false)
+            {
+                name = "Chart Note Fallback Sprite Texture",
+                hideFlags = HideFlags.HideAndDontSave
+            };
+
+            _fallbackTexture.SetPixel(0, 0, Color.white);
+            _fallbackTexture.Apply();
+        }
+
+        _fallbackSprite = Sprite.Create(
+            _fallbackTexture,
+            new Rect(0.0f, 0.0f, 1.0f, 1.0f),
+            new Vector2(0.5f, 0.5f),
+            1.0f);
+
+        _fallbackSprite.name = "Chart Note Fallback Sprite";
+        _fallbackSprite.hideFlags = HideFlags.HideAndDontSave;
+        return _fallbackSprite;
     }
 
     /// <summary>필수 표시 참조가 모두 연결되어 있는지 확인합니다.</summary>

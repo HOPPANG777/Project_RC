@@ -17,4 +17,209 @@ MonoBehaviour:
   _stageDuration: 30
   _bpm: 120
   _musicClip: {fileID: 0}
-  _notes: []
+  _notes:
+  - _time: 0.8
+    _side: 0
+    _value: -1.2
+    _label: Open
+    _isRequired: 1
+  - _time: 1.5
+    _side: 0
+    _value: -0.8
+    _label: Push
+    _isRequired: 1
+  - _time: 2.2
+    _side: 1
+    _value: -0.35
+    _label: Pull
+    _isRequired: 1
+  - _time: 2.9
+    _side: 0
+    _value: 0.05
+    _label: Rebound
+    _isRequired: 1
+  - _time: 3.6
+    _side: 0
+    _value: 0.45
+    _label: Rally
+    _isRequired: 1
+  - _time: 4.3
+    _side: 1
+    _value: 0.9
+    _label: Dip
+    _isRequired: 1
+  - _time: 5
+    _side: 1
+    _value: 0.55
+    _label: Drop
+    _isRequired: 1
+  - _time: 5.7
+    _side: 0
+    _value: 0.15
+    _label: Bounce
+    _isRequired: 1
+  - _time: 6.4
+    _side: 0
+    _value: 0.65
+    _label: Lift
+    _isRequired: 1
+  - _time: 7.1
+    _side: 0
+    _value: 1.1
+    _label: Break
+    _isRequired: 1
+  - _time: 7.8
+    _side: 1
+    _value: 1.45
+    _label: Reject
+    _isRequired: 1
+  - _time: 8.5
+    _side: 1
+    _value: 1.05
+    _label: Slide
+    _isRequired: 1
+  - _time: 9.2
+    _side: 1
+    _value: 0.55
+    _label: Fade
+    _isRequired: 1
+  - _time: 9.9
+    _side: 0
+    _value: 0.05
+    _label: Catch
+    _isRequired: 1
+  - _time: 10.6
+    _side: 1
+    _value: -0.35
+    _label: Shake
+    _isRequired: 1
+  - _time: 11.3
+    _side: 0
+    _value: -0.75
+    _label: Reset
+    _isRequired: 1
+  - _time: 12
+    _side: 0
+    _value: -0.25
+    _label: Rise
+    _isRequired: 1
+  - _time: 12.7
+    _side: 1
+    _value: 0.2
+    _label: Check
+    _isRequired: 1
+  - _time: 13.4
+    _side: 0
+    _value: 0.7
+    _label: Step
+    _isRequired: 1
+  - _time: 14.1
+    _side: 0
+    _value: 1.25
+    _label: Climb
+    _isRequired: 1
+  - _time: 14.8
+    _side: 1
+    _value: 1.75
+    _label: Peak
+    _isRequired: 1
+  - _time: 15.5
+    _side: 1
+    _value: 1.3
+    _label: Selloff
+    _isRequired: 1
+  - _time: 16.2
+    _side: 1
+    _value: 0.85
+    _label: Lower
+    _isRequired: 1
+  - _time: 16.9
+    _side: 0
+    _value: 0.4
+    _label: Support
+    _isRequired: 1
+  - _time: 17.6
+    _side: 0
+    _value: 0.95
+    _label: Turn
+    _isRequired: 1
+  - _time: 18.3
+    _side: 1
+    _value: 1.35
+    _label: Trap
+    _isRequired: 1
+  - _time: 19
+    _side: 0
+    _value: 0.9
+    _label: Recover
+    _isRequired: 1
+  - _time: 19.7
+    _side: 0
+    _value: 1.4
+    _label: Surge
+    _isRequired: 1
+  - _time: 20.4
+    _side: 0
+    _value: 1.95
+    _label: High
+    _isRequired: 1
+  - _time: 21.1
+    _side: 1
+    _value: 1.55
+    _label: Trim
+    _isRequired: 1
+  - _time: 21.8
+    _side: 1
+    _value: 1.05
+    _label: Fall
+    _isRequired: 1
+  - _time: 22.5
+    _side: 1
+    _value: 0.5
+    _label: Flush
+    _isRequired: 1
+  - _time: 23.2
+    _side: 0
+    _value: -0.05
+    _label: Grab
+    _isRequired: 1
+  - _time: 23.9
+    _side: 1
+    _value: -0.45
+    _label: Sweep
+    _isRequired: 1
+  - _time: 24.6
+    _side: 0
+    _value: -0.95
+    _label: Base
+    _isRequired: 1
+  - _time: 25.3
+    _side: 0
+    _value: -0.55
+    _label: Pop
+    _isRequired: 1
+  - _time: 26
+    _side: 1
+    _value: -0.05
+    _label: Switch
+    _isRequired: 1
+  - _time: 26.7
+    _side: 0
+    _value: 0.45
+    _label: Kick
+    _isRequired: 1
+  - _time: 27.4
+    _side: 1
+    _value: 0.95
+    _label: Final
+    _isRequired: 1
+  - _time: 28.1
+    _side: 0
+    _value: 0.55
+    _label: Close
+    _isRequired: 1
+  - _time: 28.8
+    _side: 0
+    _value: 1.05
+    _label: Last
+    _isRequired: 1

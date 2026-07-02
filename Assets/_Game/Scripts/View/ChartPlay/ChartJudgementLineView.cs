@@ -24,11 +24,14 @@ public class ChartJudgementLineView : MonoBehaviour, IChartJudgementLineView
     // 판정선 두께가 0이 되는 상황을 막기 위한 최소 두께입니다.
     private const float MIN_LINE_WIDTH = 0.001f;
 
-    // 판정선 기본 가로 길이입니다.
+    // 판정선 기본 세로 길이입니다.
     private const float DEFAULT_LINE_LENGTH = 12.0f;
 
     // 판정선 기본 두께입니다.
     private const float DEFAULT_LINE_WIDTH = 0.05f;
+
+    // 판정선이 캔들 노트보다 앞에 보이도록 사용하는 기본 정렬 순서입니다.
+    private const int DEFAULT_SORTING_ORDER = 20;
 
     //==============================================================================
     // 직렬화 필드
@@ -46,7 +49,7 @@ public class ChartJudgementLineView : MonoBehaviour, IChartJudgementLineView
     private Transform _closePointMarker;
 
     [TabGroup("Settings")]
-    [Tooltip("월드 기준 판정선 가로 길이입니다.")]
+    [Tooltip("월드 기준 판정선 세로 길이입니다.")]
     [MinValue(MIN_LINE_LENGTH)]
     [SerializeField]
     private float _lineLength = DEFAULT_LINE_LENGTH;
@@ -190,9 +193,9 @@ public class ChartJudgementLineView : MonoBehaviour, IChartJudgementLineView
     }
 
     /// <summary>
-    /// 판정선 가로 길이를 변경합니다.
+    /// 판정선 세로 길이를 변경합니다.
     /// </summary>
-    /// <param name="lineLength">새 가로 길이입니다.</param>
+    /// <param name="lineLength">새 세로 길이입니다.</param>
     public void SetLineLength(float lineLength)
     {
         _lineLength = GetSafePositiveValue(lineLength, DEFAULT_LINE_LENGTH, MIN_LINE_LENGTH);
@@ -234,12 +237,64 @@ public class ChartJudgementLineView : MonoBehaviour, IChartJudgementLineView
     /// <summary>같은 오브젝트에 있는 기본 참조를 캐시합니다.</summary>
     private void TryCacheDefaultRefs()
     {
-        if (_lineRenderer != null)
+        if (_lineRenderer == null)
+        {
+            _lineRenderer = GetComponent<LineRenderer>();
+        }
+
+        if (_lineRenderer == null)
+        {
+            _lineRenderer = gameObject.AddComponent<LineRenderer>();
+        }
+
+        ApplyDefaultLineRendererSettings();
+    }
+
+    /// <summary>새로 생성했거나 비어 있는 LineRenderer의 기본 표시 설정을 맞춥니다.</summary>
+    private void ApplyDefaultLineRendererSettings()
+    {
+        if (_lineRenderer == null)
         {
             return;
         }
 
-        _lineRenderer = GetComponent<LineRenderer>();
+        if (_lineRenderer.sharedMaterial == null)
+        {
+            _lineRenderer.sharedMaterial = GetFallbackLineMaterial();
+        }
+
+        _lineRenderer.sortingOrder = DEFAULT_SORTING_ORDER;
+        _lineRenderer.numCapVertices = 2;
+        _lineRenderer.numCornerVertices = 2;
+    }
+
+    /// <summary>프로젝트에 별도 머티리얼이 없어도 판정선을 그릴 수 있는 기본 머티리얼을 반환합니다.</summary>
+    private static Material GetFallbackLineMaterial()
+    {
+        Shader shader = Shader.Find("Sprites/Default");
+
+        if (shader == null)
+        {
+            shader = Shader.Find("Universal Render Pipeline/2D/Sprite-Unlit-Default");
+        }
+
+        if (shader == null)
+        {
+            shader = Shader.Find("Unlit/Color");
+        }
+
+        if (shader == null)
+        {
+            return null;
+        }
+
+        Material material = new Material(shader)
+        {
+            name = "Chart Judgement Line Default Material",
+            hideFlags = HideFlags.HideAndDontSave
+        };
+
+        return material;
     }
 
     /// <summary>설정값을 안전한 범위로 보정합니다.</summary>
@@ -249,7 +304,7 @@ public class ChartJudgementLineView : MonoBehaviour, IChartJudgementLineView
         _lineWidth = GetSafePositiveValue(_lineWidth, DEFAULT_LINE_WIDTH, MIN_LINE_WIDTH);
     }
 
-    /// <summary>LineRenderer의 좌우 점 위치를 판정선 길이에 맞춰 갱신합니다.</summary>
+    /// <summary>LineRenderer의 위아래 점 위치를 판정선 길이에 맞춰 갱신합니다.</summary>
     private void RefreshLinePosition()
     {
         if (_lineRenderer == null)
@@ -259,8 +314,8 @@ public class ChartJudgementLineView : MonoBehaviour, IChartJudgementLineView
 
         float halfLength = _lineLength * 0.5f;
 
-        _lineRenderer.SetPosition(0, new Vector3(-halfLength, 0.0f, 0.0f));
-        _lineRenderer.SetPosition(1, new Vector3(halfLength, 0.0f, 0.0f));
+        _lineRenderer.SetPosition(0, new Vector3(0.0f, -halfLength, 0.0f));
+        _lineRenderer.SetPosition(1, new Vector3(0.0f, halfLength, 0.0f));
     }
 
     /// <summary>LineRenderer의 두께를 갱신합니다.</summary>

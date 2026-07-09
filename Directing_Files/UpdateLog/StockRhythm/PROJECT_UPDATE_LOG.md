@@ -74,6 +74,7 @@
 | 결과 화면 | Accuracy, MaxCombo, Profit |
 | 실제 패턴표 제작 | 후순위 |
 | 현재 기획 우선순위 | 플레이 플로우, UI/UX, 디자인 양식, 씬별 요소 |
+| Stage Brief 요소 | 전부 채택 |
 
 ## 개발자 결정 영역
 
@@ -96,9 +97,8 @@
 
 ## 후속 작업
 
-1. Stage Brief 요소를 확정한다.
-2. Tutorial Overlay 요소를 확정한다.
-3. Gameplay 필수 UI를 확정한다.
-4. Result 표시 항목을 확정한다.
-5. Retry / Exit 처리 방식을 확정한다.
-6. Settings와 Sync/Offset의 MVP 포함 범위를 정한다.
+1. Tutorial Overlay 요소를 확정한다.
+2. Gameplay 필수 UI를 확정한다.
+3. Result 표시 항목을 확정한다.
+4. Retry / Exit 처리 방식을 확정한다.
+5. Settings와 Sync/Offset의 MVP 포함 범위를 정한다.

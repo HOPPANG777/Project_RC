@@ -101,7 +101,6 @@ public class GameRoot : Singleton<GameRoot>
         }
 
         _chartRunController.Init();
-        InitChartCameraFollowPresenter();
 
         if (_chartStageController == null)
         {
@@ -130,6 +129,7 @@ public class GameRoot : Singleton<GameRoot>
             _chartInputController,
             _chartStageController,
             _chartRunController);
+        InitChartCameraFollowPresenter();
 
         if (_chartPlayController == null)
         {
@@ -152,7 +152,10 @@ public class GameRoot : Singleton<GameRoot>
             return;
         }
 
-        _chartCameraFollowPresenter.Init(_chartRunController);
+        _chartCameraFollowPresenter.Init(
+            _chartRunController,
+            _chartStageController,
+            _chartJudgementController);
     }
 
     /// <summary>선택적으로 등록된 플레이 표면 Presenter를 초기화합니다.</summary>

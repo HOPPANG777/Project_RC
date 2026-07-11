@@ -309,7 +309,7 @@ MonoBehaviour:
   _startX: 0
   _runnerY: 0
   _nodeInterval: 0.1
-  _unitsPerNode: 1
+  _unitsPerNode: 0.18
   _stageDuration: 30
   _dspStartDelay: 0.1
   _controlMusicAudioSource: 1
@@ -700,6 +700,10 @@ MonoBehaviour:
   _followEnabledOnStart: 1
   _followScale: 1
   _xOffset: 0
+  _followChartCenterY: 1
+  _yFollowScale: 1
+  _yOffset: 0
+  _verticalFollowSharpness: 10
 --- !u!1 &2104384978
 GameObject:
   m_ObjectHideFlags: 0
@@ -1147,13 +1151,15 @@ MonoBehaviour:
   _closeRangeRenderer: {fileID: 1983222020}
   _directionMarkerTransform: {fileID: 0}
   _directionMarkerRenderer: {fileID: 0}
-  _bodyWidth: 2
-  _bodyHeight: 5
+  _bodyWidth: 0.64
+  _bodyHeight: 0.9
   _wickWidth: 0.06
   _wickHeight: 1.25
-  _closeRangeHeight: 0.12
-  _buyColor: {r: 0.25, g: 1, b: 0.35, a: 1}
-  _sellColor: {r: 1, g: 0.22, b: 0.18, a: 1}
+  _closeRangeHeight: 0.08
+  _customBodyVisualHeight: 0.18
+  _customWickExtension: 0.08
+  _buyColor: {r: 0.92, g: 0.04, b: 0.04, a: 1}
+  _sellColor: {r: 0.04, g: 0.42, b: 0.82, a: 1}
   _closeRangeColorMultiplier: 0.55
   _requiredAlpha: 1
   _decorativeAlpha: 0.45

@@ -8,6 +8,7 @@ using UnityEngine;
 // - ChartStageDataSO의 ChartNoteData를 런타임 판정/표시용으로 감싼 객체입니다.
 // - 화면 프리팹이 없어도 JudgementController가 먼저 판정 로직을 만들 수 있게 합니다.
 // - IsJudged는 입력 판정 또는 MISS 처리 이후 중복 판정을 막기 위한 상태입니다.
+// - WorldPosition은 종가 판정 기준점이며, 선택적으로 OHLC 월드 Y 값을 함께 가집니다.
 //==============================================================================
 
 public class ChartPlacedNote
@@ -22,8 +23,23 @@ public class ChartPlacedNote
     // 스테이지 노트 배열 안에서의 원본 인덱스입니다.
     private readonly int _index;
 
-    // ChartRun 시간축과 note.Value를 기준으로 계산한 월드 위치입니다.
+    // ChartRun 시간축과 note.Value를 기준으로 계산한 종가 판정 기준 월드 위치입니다.
     private Vector3 _worldPosition;
+
+    // 실제 OHLC 캔들 형태를 사용할지 여부입니다.
+    private bool _hasCustomCandleShape;
+
+    // 커스텀 캔들에서 시가로 사용할 월드 Y 위치입니다.
+    private float _openWorldY;
+
+    // 커스텀 캔들에서 고가로 사용할 월드 Y 위치입니다.
+    private float _highWorldY;
+
+    // 커스텀 캔들에서 저가로 사용할 월드 Y 위치입니다.
+    private float _lowWorldY;
+
+    // 커스텀 캔들에서 종가로 사용할 월드 Y 위치입니다.
+    private float _closeWorldY;
 
     // 이 노트가 이미 판정되었는지 여부입니다.
     private bool _isJudged;
@@ -35,8 +51,23 @@ public class ChartPlacedNote
     /// <summary>원본 캔들 노트 데이터입니다.</summary>
     public ChartNoteData Data => _data;
 
-    /// <summary>ChartRun 시간축과 note.Value를 기준으로 계산한 월드 위치입니다.</summary>
+    /// <summary>ChartRun 시간축과 note.Value를 기준으로 계산한 종가 판정 기준 월드 위치입니다.</summary>
     public Vector3 WorldPosition => _worldPosition;
+
+    /// <summary>실제 OHLC 캔들 형태를 사용할지 여부입니다.</summary>
+    public bool HasCustomCandleShape => _hasCustomCandleShape;
+
+    /// <summary>커스텀 캔들에서 시가로 사용할 월드 Y 위치입니다.</summary>
+    public float OpenWorldY => _openWorldY;
+
+    /// <summary>커스텀 캔들에서 고가로 사용할 월드 Y 위치입니다.</summary>
+    public float HighWorldY => _highWorldY;
+
+    /// <summary>커스텀 캔들에서 저가로 사용할 월드 Y 위치입니다.</summary>
+    public float LowWorldY => _lowWorldY;
+
+    /// <summary>커스텀 캔들에서 종가로 사용할 월드 Y 위치입니다.</summary>
+    public float CloseWorldY => _closeWorldY;
 
     /// <summary>이 노트가 이미 판정되었는지 여부입니다.</summary>
     public bool IsJudged => _isJudged;
@@ -87,6 +118,11 @@ public class ChartPlacedNote
         _data = data;
         _worldPosition = worldPosition;
         _index = index;
+        _hasCustomCandleShape = false;
+        _openWorldY = worldPosition.y;
+        _highWorldY = worldPosition.y;
+        _lowWorldY = worldPosition.y;
+        _closeWorldY = worldPosition.y;
         _isJudged = false;
     }
 
@@ -100,7 +136,50 @@ public class ChartPlacedNote
     /// <param name="worldPosition">새 월드 위치입니다.</param>
     public void SetWorldPosition(Vector3 worldPosition)
     {
+        float yDelta = worldPosition.y - _worldPosition.y;
+
         _worldPosition = worldPosition;
+
+        if (_hasCustomCandleShape)
+        {
+            _openWorldY += yDelta;
+            _highWorldY += yDelta;
+            _lowWorldY += yDelta;
+            _closeWorldY += yDelta;
+            return;
+        }
+
+        _openWorldY = worldPosition.y;
+        _highWorldY = worldPosition.y;
+        _lowWorldY = worldPosition.y;
+        _closeWorldY = worldPosition.y;
+    }
+
+    /// <summary>
+    /// 실제 OHLC 캔들 표시용 월드 Y 위치를 설정합니다.
+    /// </summary>
+    /// <param name="openWorldY">시가 월드 Y 위치입니다.</param>
+    /// <param name="highWorldY">고가 월드 Y 위치입니다.</param>
+    /// <param name="lowWorldY">저가 월드 Y 위치입니다.</param>
+    /// <param name="closeWorldY">종가 월드 Y 위치입니다.</param>
+    public void SetCustomCandleWorldShape(
+        float openWorldY,
+        float highWorldY,
+        float lowWorldY,
+        float closeWorldY)
+    {
+        float bodyTopY = Mathf.Max(openWorldY, closeWorldY);
+        float bodyBottomY = Mathf.Min(openWorldY, closeWorldY);
+
+        _hasCustomCandleShape = true;
+        _openWorldY = openWorldY;
+        _highWorldY = Mathf.Max(highWorldY, bodyTopY);
+        _lowWorldY = Mathf.Min(lowWorldY, bodyBottomY);
+        _closeWorldY = closeWorldY;
+
+        Vector3 nextPosition = _worldPosition;
+        nextPosition.y = closeWorldY;
+        _worldPosition = nextPosition;
     }
 
     /// <summary>이 노트를 판정 완료 상태로 표시합니다.</summary>

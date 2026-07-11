@@ -355,6 +355,7 @@ public class ChartStageController : MonoBehaviour, IChartStageService
             Vector3 worldPosition = CalculateWorldPosition(noteData);
             ChartPlacedNote placedNote = new ChartPlacedNote(noteData, worldPosition, i);
 
+            ApplyCustomCandleShapeIfNeeded(noteData, placedNote);
             _placedNotes.Add(placedNote);
         }
     }
@@ -367,9 +368,45 @@ public class ChartStageController : MonoBehaviour, IChartStageService
     private Vector3 CalculateWorldPosition(ChartNoteData noteData)
     {
         float x = _chartPositionProvider.GetXAtTime(noteData.Time);
-        float y = ConvertValueToWorldY(noteData.Value);
+        float y = ConvertValueToWorldY(noteData.CloseValue);
 
         return new Vector3(x, y, _noteWorldZ);
+    }
+
+    /// <summary>
+    /// 노트에 커스텀 OHLC 캔들 값이 있으면 런타임 배치 노트에 월드 Y 형태 정보를 설정합니다.
+    /// </summary>
+    /// <param name="noteData">캔들 형태 값을 가진 원본 노트 데이터입니다.</param>
+    /// <param name="placedNote">월드 형태 정보를 받을 런타임 배치 노트입니다.</param>
+    private void ApplyCustomCandleShapeIfNeeded(ChartNoteData noteData, ChartPlacedNote placedNote)
+    {
+        if (noteData == null)
+        {
+            return;
+        }
+
+        if (placedNote == null)
+        {
+            return;
+        }
+
+        if (noteData.UseCustomCandleShape == false)
+        {
+            return;
+        }
+
+        float closeValue = GetSafeFiniteValue(noteData.CloseValue, noteData.Value);
+        float openValue = GetSafeFiniteValue(noteData.OpenValue, closeValue);
+        float bodyTopValue = Mathf.Max(openValue, closeValue);
+        float bodyBottomValue = Mathf.Min(openValue, closeValue);
+        float highValue = Mathf.Max(GetSafeFiniteValue(noteData.HighValue, bodyTopValue), bodyTopValue);
+        float lowValue = Mathf.Min(GetSafeFiniteValue(noteData.LowValue, bodyBottomValue), bodyBottomValue);
+
+        placedNote.SetCustomCandleWorldShape(
+            ConvertValueToWorldY(openValue),
+            ConvertValueToWorldY(highValue),
+            ConvertValueToWorldY(lowValue),
+            ConvertValueToWorldY(closeValue));
     }
 
     /// <summary>
@@ -447,6 +484,27 @@ public class ChartStageController : MonoBehaviour, IChartStageService
         }
 
         return Mathf.Max(value, minimum);
+    }
+
+    /// <summary>
+    /// 유한한 실수 값만 통과시키고 잘못된 값이면 대체 값을 반환합니다.
+    /// </summary>
+    /// <param name="value">검증할 원본 값입니다.</param>
+    /// <param name="fallback">잘못된 값일 때 사용할 대체 값입니다.</param>
+    /// <returns>유한한 원본 값 또는 대체 값입니다.</returns>
+    private static float GetSafeFiniteValue(float value, float fallback)
+    {
+        if (float.IsNaN(value))
+        {
+            return fallback;
+        }
+
+        if (float.IsInfinity(value))
+        {
+            return fallback;
+        }
+
+        return value;
     }
 
     /// <summary>

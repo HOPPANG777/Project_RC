@@ -8,9 +8,9 @@
 /// </summary>
 public enum ChartNoteSide
 {
-    /// <summary>초록 상승 캔들로 표현되는 BUY 입력입니다.</summary>
+    /// <summary>양봉 또는 상승 캔들로 표현되는 BUY 입력입니다.</summary>
     NOTE_SIDE_BUY = 0,
 
-    /// <summary>빨간 하락 캔들로 표현되는 SELL 입력입니다.</summary>
+    /// <summary>음봉 또는 하락 캔들로 표현되는 SELL 입력입니다.</summary>
     NOTE_SIDE_SELL = 1
 }

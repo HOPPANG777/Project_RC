@@ -6,7 +6,8 @@ using UnityEngine;
 // 설명: Gameplay 화면에서 BUY / SELL 입력 대상이 되는 캔들 노트를 표시하는 View
 //==============================================================================
 // 세부 구현 사항
-// - Directing 기준에 맞춰 BUY는 초록 상승 캔들, SELL은 빨간 하락 캔들로 표시합니다.
+// - 실제 주식 캔들처럼 시가/종가 몸통과 고가/저가 꼬리를 분리해 표시합니다.
+// - 커스텀 OHLC 값이 없으면 BUY는 양봉, SELL은 음봉 형태의 기본 캔들로 표시합니다.
 // - 캔들 몸통, 꼬리, 종가 범위를 분리해 판정 기준점을 시각적으로 알 수 있게 합니다.
 // - Transform 원점은 ChartPlacedNote.WorldPosition과 일치하는 종가 판정 기준점입니다.
 //==============================================================================
@@ -27,8 +28,14 @@ public class ChartNoteView : MonoBehaviour, IChartNoteView
     // 종가 범위 크기가 0이 되는 상황을 막기 위한 최소값입니다.
     private const float MIN_CLOSE_RANGE_SIZE = 0.001f;
 
+    // 커스텀 캔들 최소 몸통 높이가 0이 되는 상황을 막기 위한 최소값입니다.
+    private const float MIN_CUSTOM_BODY_VISUAL_HEIGHT = 0.01f;
+
+    // 커스텀 캔들 최소 꼬리 확장 길이가 음수가 되는 상황을 막기 위한 최소값입니다.
+    private const float MIN_CUSTOM_WICK_EXTENSION = 0.0f;
+
     // 기본 캔들 몸통 너비입니다.
-    private const float DEFAULT_BODY_WIDTH = 0.35f;
+    private const float DEFAULT_BODY_WIDTH = 0.64f;
 
     // 기본 캔들 몸통 높이입니다.
     private const float DEFAULT_BODY_HEIGHT = 0.9f;
@@ -40,7 +47,13 @@ public class ChartNoteView : MonoBehaviour, IChartNoteView
     private const float DEFAULT_WICK_HEIGHT = 1.25f;
 
     // 기본 종가 범위 높이입니다.
-    private const float DEFAULT_CLOSE_RANGE_HEIGHT = 0.12f;
+    private const float DEFAULT_CLOSE_RANGE_HEIGHT = 0.08f;
+
+    // 커스텀 OHLC 캔들이 화면에서 너무 작게 보이지 않도록 보장할 기본 몸통 높이입니다.
+    private const float DEFAULT_CUSTOM_BODY_VISUAL_HEIGHT = 0.18f;
+
+    // 커스텀 OHLC 캔들이 화면에서 꼬리를 읽을 수 있도록 보장할 기본 꼬리 확장 길이입니다.
+    private const float DEFAULT_CUSTOM_WICK_EXTENSION = 0.08f;
 
     // 자동 구성할 캔들 파트 이름입니다.
     private const string BODY_PART_NAME = "Body";
@@ -137,14 +150,26 @@ public class ChartNoteView : MonoBehaviour, IChartNoteView
     private float _closeRangeHeight = DEFAULT_CLOSE_RANGE_HEIGHT;
 
     [TabGroup("Settings")]
-    [Tooltip("BUY 노트에 사용할 선명한 초록 색상입니다.")]
+    [Tooltip("커스텀 OHLC 캔들이 화면에서 너무 작게 보이지 않도록 보장할 최소 몸통 높이입니다.")]
+    [MinValue(MIN_CUSTOM_BODY_VISUAL_HEIGHT)]
     [SerializeField]
-    private Color _buyColor = new Color(0.25f, 1.0f, 0.35f, 1.0f);
+    private float _customBodyVisualHeight = DEFAULT_CUSTOM_BODY_VISUAL_HEIGHT;
 
     [TabGroup("Settings")]
-    [Tooltip("SELL 노트에 사용할 선명한 빨강 색상입니다.")]
+    [Tooltip("커스텀 OHLC 캔들이 화면에서 꼬리를 읽을 수 있도록 몸통 위아래에 보장할 최소 꼬리 길이입니다.")]
+    [MinValue(MIN_CUSTOM_WICK_EXTENSION)]
     [SerializeField]
-    private Color _sellColor = new Color(1.0f, 0.22f, 0.18f, 1.0f);
+    private float _customWickExtension = DEFAULT_CUSTOM_WICK_EXTENSION;
+
+    [TabGroup("Settings")]
+    [Tooltip("양봉 또는 BUY 노트에 사용할 색상입니다. 국내 주식 차트 느낌을 원하면 빨강 계열을 사용합니다.")]
+    [SerializeField]
+    private Color _buyColor = new Color(0.92f, 0.04f, 0.04f, 1.0f);
+
+    [TabGroup("Settings")]
+    [Tooltip("음봉 또는 SELL 노트에 사용할 색상입니다. 국내 주식 차트 느낌을 원하면 파랑 계열을 사용합니다.")]
+    [SerializeField]
+    private Color _sellColor = new Color(0.04f, 0.42f, 0.82f, 1.0f);
 
     [TabGroup("Settings")]
     [Tooltip("종가 판정 범위에 적용할 명도 배율입니다.")]
@@ -187,6 +212,9 @@ public class ChartNoteView : MonoBehaviour, IChartNoteView
 
     // 현재 노트가 요구하는 BUY 또는 SELL 입력 방향입니다.
     private ChartNoteSide _side = ChartNoteSide.NOTE_SIDE_BUY;
+
+    // 현재 캔들을 양봉 색상으로 표시할지 여부입니다.
+    private bool _isBullishVisual = true;
 
     // 현재 노트가 판정 완료 상태로 표시되는지 여부입니다.
     private bool _isJudged;
@@ -232,6 +260,13 @@ public class ChartNoteView : MonoBehaviour, IChartNoteView
     [ReadOnly]
     [LabelText("표시 상태")]
     private bool IsVisible => _isVisible;
+
+    /// <summary>현재 캔들이 양봉 색상으로 표시되는지 여부입니다.</summary>
+    [TabGroup("Runtime")]
+    [ShowInInspector]
+    [ReadOnly]
+    [LabelText("양봉 표시")]
+    private bool IsBullishVisual => _isBullishVisual;
 
     /// <summary>현재 연결된 노트 인덱스입니다.</summary>
     [TabGroup("Runtime")]
@@ -457,6 +492,8 @@ public class ChartNoteView : MonoBehaviour, IChartNoteView
         {
             _closeRangeTransform = _closeRangeRenderer.transform;
         }
+
+        EnsureSharpCornerSprites();
     }
 
     /// <summary>지정한 이름의 캔들 파트를 찾거나 새로 만들어 SpriteRenderer를 반환합니다.</summary>
@@ -482,27 +519,38 @@ public class ChartNoteView : MonoBehaviour, IChartNoteView
             spriteRenderer = partTransform.gameObject.AddComponent<SpriteRenderer>();
         }
 
-        if (spriteRenderer.sprite == null)
-        {
-            spriteRenderer.sprite = GetFallbackSprite();
-        }
+        spriteRenderer.sprite = GetFallbackSprite();
 
         spriteRenderer.sortingOrder = sortingOrder;
         return spriteRenderer;
     }
 
+    /// <summary>캔들 몸통, 꼬리, 종가 범위가 둥근 기본 UI 스프라이트 대신 각진 사각형 스프라이트를 쓰게 합니다.</summary>
+    private void EnsureSharpCornerSprites()
+    {
+        Sprite sharpSprite = GetFallbackSprite();
+
+        SetRendererSprite(_bodyRenderer, sharpSprite);
+        SetRendererSprite(_wickRenderer, sharpSprite);
+        SetRendererSprite(_closeRangeRenderer, sharpSprite);
+    }
+
+    /// <summary>SpriteRenderer에 null 안전하게 스프라이트를 설정합니다.</summary>
+    /// <param name="targetRenderer">스프라이트를 설정할 렌더러입니다.</param>
+    /// <param name="sprite">적용할 스프라이트입니다.</param>
+    private static void SetRendererSprite(SpriteRenderer targetRenderer, Sprite sprite)
+    {
+        if (targetRenderer == null || sprite == null)
+        {
+            return;
+        }
+
+        targetRenderer.sprite = sprite;
+    }
+
     /// <summary>별도 에셋 없이 캔들 파트를 표시하기 위한 기본 흰 사각형 스프라이트를 반환합니다.</summary>
     private static Sprite GetFallbackSprite()
     {
-#if UNITY_EDITOR
-        Sprite editorSprite = UnityEditor.AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
-
-        if (editorSprite != null)
-        {
-            return editorSprite;
-        }
-#endif
-
         if (_fallbackSprite != null)
         {
             return _fallbackSprite;
@@ -516,6 +564,8 @@ public class ChartNoteView : MonoBehaviour, IChartNoteView
                 hideFlags = HideFlags.HideAndDontSave
             };
 
+            _fallbackTexture.filterMode = FilterMode.Point;
+            _fallbackTexture.wrapMode = TextureWrapMode.Clamp;
             _fallbackTexture.SetPixel(0, 0, Color.white);
             _fallbackTexture.Apply();
         }
@@ -564,24 +614,223 @@ public class ChartNoteView : MonoBehaviour, IChartNoteView
             _closeRangeHeight,
             DEFAULT_CLOSE_RANGE_HEIGHT,
             MIN_CLOSE_RANGE_SIZE);
+        _customBodyVisualHeight = GetSafePositiveValue(
+            _customBodyVisualHeight,
+            DEFAULT_CUSTOM_BODY_VISUAL_HEIGHT,
+            MIN_CUSTOM_BODY_VISUAL_HEIGHT);
+        _customWickExtension = GetSafeNonNegativeValue(
+            _customWickExtension,
+            DEFAULT_CUSTOM_WICK_EXTENSION);
     }
 
-    /// <summary>현재 BUY / SELL 방향에 맞춰 캔들 몸통, 꼬리, 종가 범위 배치를 갱신합니다.</summary>
+    /// <summary>현재 노트 데이터에 맞춰 캔들 몸통, 꼬리, 종가 범위 배치를 갱신합니다.</summary>
     private void RefreshCandleGeometry()
     {
+        if (TryRefreshCustomCandleGeometry())
+        {
+            RefreshDirectionMarker(GetDirectionSign(_side));
+            return;
+        }
+
+        RefreshDefaultCandleGeometry();
+        RefreshDirectionMarker(GetDirectionSign(_side));
+    }
+
+    /// <summary>커스텀 OHLC 값이 있으면 실제 캔들 형태로 배치를 갱신합니다.</summary>
+    /// <returns>커스텀 캔들 배치를 적용했으면 true입니다.</returns>
+    private bool TryRefreshCustomCandleGeometry()
+    {
+        if (_boundNote == null)
+        {
+            return false;
+        }
+
+        if (_boundNote.HasCustomCandleShape == false)
+        {
+            return false;
+        }
+
+        float closeLocalY = 0.0f;
+        float openLocalY = _boundNote.OpenWorldY - _boundNote.CloseWorldY;
+        float highLocalY = _boundNote.HighWorldY - _boundNote.CloseWorldY;
+        float lowLocalY = _boundNote.LowWorldY - _boundNote.CloseWorldY;
+
+        ApplyCustomMinimumVisualSize(
+            ref openLocalY,
+            closeLocalY,
+            ref highLocalY,
+            ref lowLocalY);
+        ApplyCandleGeometry(openLocalY, closeLocalY, highLocalY, lowLocalY);
+        return true;
+    }
+
+    /// <summary>
+    /// 커스텀 OHLC 값이 작아도 플레이 화면에서 읽히도록 최소 몸통/꼬리 크기를 보장합니다.
+    /// </summary>
+    /// <param name="openLocalY">시가의 로컬 Y 위치입니다.</param>
+    /// <param name="closeLocalY">종가의 로컬 Y 위치입니다.</param>
+    /// <param name="highLocalY">고가의 로컬 Y 위치입니다.</param>
+    /// <param name="lowLocalY">저가의 로컬 Y 위치입니다.</param>
+    private void ApplyCustomMinimumVisualSize(
+        ref float openLocalY,
+        float closeLocalY,
+        ref float highLocalY,
+        ref float lowLocalY)
+    {
+        float direction = GetCandleVisualDirection(openLocalY, closeLocalY);
+        float bodyHeight = Mathf.Abs(closeLocalY - openLocalY);
+
+        if (bodyHeight < _customBodyVisualHeight)
+        {
+            openLocalY = closeLocalY - direction * _customBodyVisualHeight;
+        }
+
+        float bodyTopY = Mathf.Max(openLocalY, closeLocalY);
+        float bodyBottomY = Mathf.Min(openLocalY, closeLocalY);
+        highLocalY = Mathf.Max(highLocalY, bodyTopY + _customWickExtension);
+        lowLocalY = Mathf.Min(lowLocalY, bodyBottomY - _customWickExtension);
+    }
+
+    /// <summary>커스텀 OHLC 값이 없는 노트를 입력 방향 기준 기본 캔들 형태로 갱신합니다.</summary>
+    private void RefreshDefaultCandleGeometry()
+    {
         float direction = GetDirectionSign(_side);
-        float bodyCenterY = -direction * _bodyHeight * 0.5f;
+        float openLocalY = -direction * _bodyHeight;
+        float closeLocalY = 0.0f;
+        float wickExtension = GetDefaultWickExtension();
+        float highLocalY = Mathf.Max(openLocalY, closeLocalY) + wickExtension;
+        float lowLocalY = Mathf.Min(openLocalY, closeLocalY) - wickExtension;
+
+        ApplyCandleGeometry(openLocalY, closeLocalY, highLocalY, lowLocalY);
+    }
+
+    /// <summary>
+    /// 시가/종가/고가/저가의 로컬 Y 값을 기준으로 캔들 파트 위치와 크기를 적용합니다.
+    /// </summary>
+    /// <param name="openLocalY">시가의 로컬 Y 위치입니다.</param>
+    /// <param name="closeLocalY">종가의 로컬 Y 위치입니다.</param>
+    /// <param name="highLocalY">고가의 로컬 Y 위치입니다.</param>
+    /// <param name="lowLocalY">저가의 로컬 Y 위치입니다.</param>
+    private void ApplyCandleGeometry(
+        float openLocalY,
+        float closeLocalY,
+        float highLocalY,
+        float lowLocalY)
+    {
+        float bodyTopY = Mathf.Max(openLocalY, closeLocalY);
+        float bodyBottomY = Mathf.Min(openLocalY, closeLocalY);
+        float safeHighY = Mathf.Max(highLocalY, bodyTopY);
+        float safeLowY = Mathf.Min(lowLocalY, bodyBottomY);
+        float bodyCenterY = (bodyTopY + bodyBottomY) * 0.5f;
+        float wickCenterY = (safeHighY + safeLowY) * 0.5f;
+        float bodyHeight = Mathf.Max(bodyTopY - bodyBottomY, MIN_BODY_SIZE);
+        float wickHeight = Mathf.Max(safeHighY - safeLowY, MIN_WICK_SIZE);
+
+        _isBullishVisual = IsBullishCandle(openLocalY, closeLocalY);
 
         _bodyTransform.localPosition = new Vector3(0.0f, bodyCenterY, 0.0f);
-        _bodyTransform.localScale = new Vector3(_bodyWidth, _bodyHeight, 1.0f);
+        SetSpritePartWorldSize(_bodyTransform, _bodyRenderer, _bodyWidth, bodyHeight);
 
-        _wickTransform.localPosition = new Vector3(0.0f, bodyCenterY, 0.0f);
-        _wickTransform.localScale = new Vector3(_wickWidth, _wickHeight, 1.0f);
+        _wickTransform.localPosition = new Vector3(0.0f, wickCenterY, 0.0f);
+        SetSpritePartWorldSize(_wickTransform, _wickRenderer, _wickWidth, wickHeight);
 
-        _closeRangeTransform.localPosition = Vector3.zero;
-        _closeRangeTransform.localScale = new Vector3(_bodyWidth, _closeRangeHeight, 1.0f);
+        _closeRangeTransform.localPosition = new Vector3(0.0f, closeLocalY, 0.0f);
+        SetSpritePartWorldSize(_closeRangeTransform, _closeRangeRenderer, _bodyWidth, _closeRangeHeight);
+    }
 
-        RefreshDirectionMarker(direction);
+    /// <summary>
+    /// Applies a world-space rectangle size to a sprite part regardless of the sprite asset bounds.
+    /// </summary>
+    /// <param name="partTransform">Transform that should receive the scale.</param>
+    /// <param name="partRenderer">Renderer that owns the sprite bounds.</param>
+    /// <param name="targetWidth">Desired world-space width.</param>
+    /// <param name="targetHeight">Desired world-space height.</param>
+    private static void SetSpritePartWorldSize(
+        Transform partTransform,
+        SpriteRenderer partRenderer,
+        float targetWidth,
+        float targetHeight)
+    {
+        if (partTransform == null)
+        {
+            return;
+        }
+
+        Vector2 spriteSize = GetSpriteLocalSize(partRenderer);
+        float safeWidth = Mathf.Max(targetWidth, MIN_BODY_SIZE);
+        float safeHeight = Mathf.Max(targetHeight, MIN_BODY_SIZE);
+
+        partTransform.localScale = new Vector3(
+            safeWidth / spriteSize.x,
+            safeHeight / spriteSize.y,
+            1.0f);
+    }
+
+    /// <summary>
+    /// Returns the local size of a sprite, falling back to 1x1 so scale values remain stable.
+    /// </summary>
+    /// <param name="partRenderer">Renderer to inspect.</param>
+    /// <returns>Sprite local bounds size.</returns>
+    private static Vector2 GetSpriteLocalSize(SpriteRenderer partRenderer)
+    {
+        if (partRenderer == null || partRenderer.sprite == null)
+        {
+            return Vector2.one;
+        }
+
+        Vector2 spriteSize = partRenderer.sprite.bounds.size;
+
+        if (spriteSize.x <= 0.0f || float.IsNaN(spriteSize.x) || float.IsInfinity(spriteSize.x))
+        {
+            spriteSize.x = 1.0f;
+        }
+
+        if (spriteSize.y <= 0.0f || float.IsNaN(spriteSize.y) || float.IsInfinity(spriteSize.y))
+        {
+            spriteSize.y = 1.0f;
+        }
+
+        return spriteSize;
+    }
+
+    /// <summary>기본 캔들의 몸통 위아래에 더할 꼬리 길이를 반환합니다.</summary>
+    /// <returns>몸통 기준 위아래 꼬리 길이입니다.</returns>
+    private float GetDefaultWickExtension()
+    {
+        float halfExtraHeight = (_wickHeight - _bodyHeight) * 0.5f;
+        return Mathf.Max(halfExtraHeight, MIN_WICK_SIZE);
+    }
+
+    /// <summary>
+    /// 캔들의 시가/종가 또는 입력 방향을 기준으로 양봉 방향을 반환합니다.
+    /// </summary>
+    /// <param name="openLocalY">시가의 로컬 Y 위치입니다.</param>
+    /// <param name="closeLocalY">종가의 로컬 Y 위치입니다.</param>
+    /// <returns>양봉이면 1, 음봉이면 -1입니다.</returns>
+    private float GetCandleVisualDirection(float openLocalY, float closeLocalY)
+    {
+        if (Mathf.Approximately(openLocalY, closeLocalY))
+        {
+            return GetDirectionSign(_side);
+        }
+
+        return closeLocalY > openLocalY ? 1.0f : -1.0f;
+    }
+
+    /// <summary>
+    /// 로컬 시가와 종가를 비교해 양봉으로 표시할지 확인합니다.
+    /// </summary>
+    /// <param name="openLocalY">시가의 로컬 Y 위치입니다.</param>
+    /// <param name="closeLocalY">종가의 로컬 Y 위치입니다.</param>
+    /// <returns>종가가 시가보다 높거나 도지 상태의 BUY 노트이면 true입니다.</returns>
+    private bool IsBullishCandle(float openLocalY, float closeLocalY)
+    {
+        if (Mathf.Approximately(openLocalY, closeLocalY))
+        {
+            return _side != ChartNoteSide.NOTE_SIDE_SELL;
+        }
+
+        return closeLocalY > openLocalY;
     }
 
     /// <summary>
@@ -619,10 +868,10 @@ public class ChartNoteView : MonoBehaviour, IChartNoteView
         SetAlpha(_requiredAlpha);
     }
 
-    /// <summary>현재 BUY / SELL 방향과 투명도에 맞춰 색상을 적용합니다.</summary>
+    /// <summary>현재 양봉/음봉 상태와 투명도에 맞춰 색상을 적용합니다.</summary>
     private void ApplyColor()
     {
-        Color baseColor = GetSideColor(_side);
+        Color baseColor = GetCandleColor();
         Color closeRangeColor = GetCloseRangeColor(baseColor);
 
         SetRendererColor(_bodyRenderer, baseColor, _currentAlpha);
@@ -641,20 +890,17 @@ public class ChartNoteView : MonoBehaviour, IChartNoteView
     }
 
     /// <summary>
-    /// 입력 방향에 맞는 캔들 색상을 반환합니다.
+    /// 현재 캔들의 양봉/음봉 상태에 맞는 색상을 반환합니다.
     /// </summary>
-    /// <param name="side">확인할 입력 방향입니다.</param>
-    /// <returns>BUY면 초록, SELL이면 빨강입니다.</returns>
-    private Color GetSideColor(ChartNoteSide side)
+    /// <returns>양봉이면 상승색, 음봉이면 하락색입니다.</returns>
+    private Color GetCandleColor()
     {
-        switch (side)
+        if (_isBullishVisual)
         {
-            case ChartNoteSide.NOTE_SIDE_SELL:
-                return _sellColor;
-            case ChartNoteSide.NOTE_SIDE_BUY:
-            default:
-                return _buyColor;
+            return _buyColor;
         }
+
+        return _sellColor;
     }
 
     /// <summary>
@@ -740,6 +986,27 @@ public class ChartNoteView : MonoBehaviour, IChartNoteView
         }
 
         return Mathf.Max(value, minimum);
+    }
+
+    /// <summary>
+    /// 0 이상이어야 하는 설정값을 안전하게 보정합니다.
+    /// </summary>
+    /// <param name="value">검증할 원본 값입니다.</param>
+    /// <param name="fallback">잘못된 값일 때 사용할 대체 값입니다.</param>
+    /// <returns>보정된 0 이상 값입니다.</returns>
+    private static float GetSafeNonNegativeValue(float value, float fallback)
+    {
+        if (float.IsNaN(value))
+        {
+            return fallback;
+        }
+
+        if (float.IsInfinity(value))
+        {
+            return fallback;
+        }
+
+        return Mathf.Max(value, 0.0f);
     }
 
     /// <summary>에디터와 개발 빌드에서만 출력되는 경고 로그입니다.</summary>

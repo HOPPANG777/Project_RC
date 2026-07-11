@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -158,6 +159,9 @@ public class ChartJudgementController : MonoBehaviour, IChartJudgementService
     [ReadOnly]
     [LabelText("버퍼 결과 수")]
     public int BufferedResultCount => _resultBuffer.Count;
+
+    /// <summary>새 판정 결과가 생성될 때 결과 소비 없이 발행되는 이벤트입니다.</summary>
+    public event Action<ChartJudgementResult> JudgementResultCreated;
 
     /// <summary>현재 ChartRun 기준 스테이지 진행 시간입니다.</summary>
     [TabGroup("Runtime")]
@@ -510,6 +514,7 @@ public class ChartJudgementController : MonoBehaviour, IChartJudgementService
         _lastResult = judgementResult;
         _hasLastResult = true;
         _resultBuffer.Enqueue(judgementResult);
+        JudgementResultCreated?.Invoke(judgementResult);
     }
 
     /// <summary>내부 판정 결과 상태만 초기화합니다.</summary>

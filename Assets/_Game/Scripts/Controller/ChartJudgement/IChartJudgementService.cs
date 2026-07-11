@@ -1,3 +1,5 @@
+using System;
+
 //==============================================================================
 // 기능: interface::IChartJudgementService
 // 설명: GameRoot가 외부에 공개하는 차트 노트 판정 시스템 계약
@@ -8,6 +10,9 @@
 /// </summary>
 public interface IChartJudgementService
 {
+    /// <summary>새 판정 결과가 생성될 때 결과 소비 없이 발행되는 이벤트입니다.</summary>
+    event Action<ChartJudgementResult> JudgementResultCreated;
+
     /// <summary>GameRoot를 통해 초기화되었는지 여부입니다.</summary>
     bool IsInitialized { get; }
 

@@ -21,205 +21,369 @@ MonoBehaviour:
   - _time: 0.8
     _side: 0
     _value: -1.2
+    _useCustomCandleShape: 1
+    _openValue: -1.63
+    _highValue: -1.04
+    _lowValue: -1.77
     _label: Open
     _isRequired: 1
   - _time: 1.5
     _side: 0
     _value: -0.8
+    _useCustomCandleShape: 1
+    _openValue: -1.15
+    _highValue: -0.68
+    _lowValue: -1.32
     _label: Push
     _isRequired: 1
   - _time: 2.2
-    _side: 1
+    _side: 0
     _value: -0.35
+    _useCustomCandleShape: 1
+    _openValue: -0.84
+    _highValue: -0.17
+    _lowValue: -0.96
     _label: Pull
     _isRequired: 1
   - _time: 2.9
     _side: 0
     _value: 0.05
+    _useCustomCandleShape: 1
+    _openValue: -0.32
+    _highValue: 0.15
+    _lowValue: -0.48
     _label: Rebound
     _isRequired: 1
   - _time: 3.6
     _side: 0
     _value: 0.45
+    _useCustomCandleShape: 1
+    _openValue: 0.03
+    _highValue: 0.59
+    _lowValue: -0.08
     _label: Rally
     _isRequired: 1
   - _time: 4.3
-    _side: 1
+    _side: 0
     _value: 0.9
+    _useCustomCandleShape: 1
+    _openValue: 0.51
+    _highValue: 1.12
+    _lowValue: 0.36
     _label: Dip
     _isRequired: 1
   - _time: 5
     _side: 1
     _value: 0.55
+    _useCustomCandleShape: 1
+    _openValue: 0.85
+    _highValue: 0.98
+    _lowValue: 0.35
     _label: Drop
     _isRequired: 1
   - _time: 5.7
-    _side: 0
+    _side: 1
     _value: 0.15
+    _useCustomCandleShape: 1
+    _openValue: 0.57
+    _highValue: 0.74
+    _lowValue: 0.02
     _label: Bounce
     _isRequired: 1
   - _time: 6.4
     _side: 0
     _value: 0.65
+    _useCustomCandleShape: 1
+    _openValue: 0.12
+    _highValue: 0.77
+    _lowValue: -0.06
     _label: Lift
     _isRequired: 1
   - _time: 7.1
     _side: 0
     _value: 1.1
+    _useCustomCandleShape: 1
+    _openValue: 0.69
+    _highValue: 1.3
+    _lowValue: 0.57
     _label: Break
     _isRequired: 1
   - _time: 7.8
-    _side: 1
+    _side: 0
     _value: 1.45
+    _useCustomCandleShape: 1
+    _openValue: 1.08
+    _highValue: 1.69
+    _lowValue: 0.94
     _label: Reject
     _isRequired: 1
   - _time: 8.5
     _side: 1
     _value: 1.05
+    _useCustomCandleShape: 1
+    _openValue: 1.48
+    _highValue: 1.6
+    _lowValue: 0.83
     _label: Slide
     _isRequired: 1
   - _time: 9.2
     _side: 1
     _value: 0.55
+    _useCustomCandleShape: 1
+    _openValue: 1
+    _highValue: 1.18
+    _lowValue: 0.42
     _label: Fade
     _isRequired: 1
   - _time: 9.9
-    _side: 0
+    _side: 1
     _value: 0.05
+    _useCustomCandleShape: 1
+    _openValue: 0.59
+    _highValue: 0.74
+    _lowValue: -0.13
     _label: Catch
     _isRequired: 1
   - _time: 10.6
     _side: 1
     _value: -0.35
+    _useCustomCandleShape: 1
+    _openValue: 0.02
+    _highValue: 0.15
+    _lowValue: -0.51
     _label: Shake
     _isRequired: 1
   - _time: 11.3
-    _side: 0
+    _side: 1
     _value: -0.75
+    _useCustomCandleShape: 1
+    _openValue: -0.33
+    _highValue: -0.12
+    _lowValue: -0.97
     _label: Reset
     _isRequired: 1
   - _time: 12
     _side: 0
     _value: -0.25
+    _useCustomCandleShape: 1
+    _openValue: -0.79
+    _highValue: -0.13
+    _lowValue: -0.91
     _label: Rise
     _isRequired: 1
   - _time: 12.7
-    _side: 1
+    _side: 0
     _value: 0.2
+    _useCustomCandleShape: 1
+    _openValue: -0.22
+    _highValue: 0.36
+    _lowValue: -0.37
     _label: Check
     _isRequired: 1
   - _time: 13.4
     _side: 0
     _value: 0.7
+    _useCustomCandleShape: 1
+    _openValue: 0.18
+    _highValue: 0.84
+    _lowValue: 0.05
     _label: Step
     _isRequired: 1
   - _time: 14.1
     _side: 0
     _value: 1.25
+    _useCustomCandleShape: 1
+    _openValue: 0.75
+    _highValue: 1.47
+    _lowValue: 0.6
     _label: Climb
     _isRequired: 1
   - _time: 14.8
-    _side: 1
+    _side: 0
     _value: 1.75
+    _useCustomCandleShape: 1
+    _openValue: 1.21
+    _highValue: 2.03
+    _lowValue: 1.05
     _label: Peak
     _isRequired: 1
   - _time: 15.5
     _side: 1
     _value: 1.3
+    _useCustomCandleShape: 1
+    _openValue: 1.77
+    _highValue: 1.94
+    _lowValue: 1.07
     _label: Selloff
     _isRequired: 1
   - _time: 16.2
     _side: 1
     _value: 0.85
+    _useCustomCandleShape: 1
+    _openValue: 1.27
+    _highValue: 1.4
+    _lowValue: 0.68
     _label: Lower
     _isRequired: 1
   - _time: 16.9
-    _side: 0
+    _side: 1
     _value: 0.4
+    _useCustomCandleShape: 1
+    _openValue: 0.89
+    _highValue: 1.05
+    _lowValue: 0.2
     _label: Support
     _isRequired: 1
   - _time: 17.6
     _side: 0
     _value: 0.95
+    _useCustomCandleShape: 1
+    _openValue: 0.38
+    _highValue: 1.15
+    _lowValue: 0.25
     _label: Turn
     _isRequired: 1
   - _time: 18.3
-    _side: 1
+    _side: 0
     _value: 1.35
+    _useCustomCandleShape: 1
+    _openValue: 0.98
+    _highValue: 1.58
+    _lowValue: 0.84
     _label: Trap
     _isRequired: 1
   - _time: 19
-    _side: 0
+    _side: 1
     _value: 0.9
+    _useCustomCandleShape: 1
+    _openValue: 1.3
+    _highValue: 1.45
+    _lowValue: 0.69
     _label: Recover
     _isRequired: 1
   - _time: 19.7
     _side: 0
     _value: 1.4
+    _useCustomCandleShape: 1
+    _openValue: 0.94
+    _highValue: 1.58
+    _lowValue: 0.82
     _label: Surge
     _isRequired: 1
   - _time: 20.4
     _side: 0
     _value: 1.95
+    _useCustomCandleShape: 1
+    _openValue: 1.37
+    _highValue: 2.21
+    _lowValue: 1.22
     _label: High
     _isRequired: 1
   - _time: 21.1
     _side: 1
     _value: 1.55
+    _useCustomCandleShape: 1
+    _openValue: 1.97
+    _highValue: 2.13
+    _lowValue: 1.35
     _label: Trim
     _isRequired: 1
   - _time: 21.8
     _side: 1
     _value: 1.05
+    _useCustomCandleShape: 1
+    _openValue: 1.51
+    _highValue: 1.65
+    _lowValue: 0.89
     _label: Fall
     _isRequired: 1
   - _time: 22.5
     _side: 1
     _value: 0.5
+    _useCustomCandleShape: 1
+    _openValue: 1.08
+    _highValue: 1.26
+    _lowValue: 0.28
     _label: Flush
     _isRequired: 1
   - _time: 23.2
-    _side: 0
+    _side: 1
     _value: -0.05
+    _useCustomCandleShape: 1
+    _openValue: 0.48
+    _highValue: 0.63
+    _lowValue: -0.19
     _label: Grab
     _isRequired: 1
   - _time: 23.9
     _side: 1
     _value: -0.45
+    _useCustomCandleShape: 1
+    _openValue: 0
+    _highValue: 0.13
+    _lowValue: -0.62
     _label: Sweep
     _isRequired: 1
   - _time: 24.6
-    _side: 0
+    _side: 1
     _value: -0.95
+    _useCustomCandleShape: 1
+    _openValue: -0.49
+    _highValue: -0.27
+    _lowValue: -1.19
     _label: Base
     _isRequired: 1
   - _time: 25.3
     _side: 0
     _value: -0.55
+    _useCustomCandleShape: 1
+    _openValue: -0.93
+    _highValue: -0.43
+    _lowValue: -1.06
     _label: Pop
     _isRequired: 1
   - _time: 26
-    _side: 1
+    _side: 0
     _value: -0.05
+    _useCustomCandleShape: 1
+    _openValue: -0.58
+    _highValue: 0.12
+    _lowValue: -0.73
     _label: Switch
     _isRequired: 1
   - _time: 26.7
     _side: 0
     _value: 0.45
+    _useCustomCandleShape: 1
+    _openValue: -0.01
+    _highValue: 0.59
+    _lowValue: -0.13
     _label: Kick
     _isRequired: 1
   - _time: 27.4
-    _side: 1
+    _side: 0
     _value: 0.95
+    _useCustomCandleShape: 1
+    _openValue: 0.43
+    _highValue: 1.16
+    _lowValue: 0.27
     _label: Final
     _isRequired: 1
   - _time: 28.1
-    _side: 0
+    _side: 1
     _value: 0.55
+    _useCustomCandleShape: 1
+    _openValue: 0.98
+    _highValue: 1.11
+    _lowValue: 0.34
     _label: Close
     _isRequired: 1
   - _time: 28.8
     _side: 0
     _value: 1.05
+    _useCustomCandleShape: 1
+    _openValue: 0.5
+    _highValue: 1.21
+    _lowValue: 0.37
     _label: Last
     _isRequired: 1

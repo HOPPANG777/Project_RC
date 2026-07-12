@@ -43,6 +43,12 @@ public class GameRoot : Singleton<GameRoot>
     private ChartJudgementController _chartJudgementController;
 
     [TabGroup("Controller")]
+    [Tooltip("Accumulates gameplay Profit, Combo, and Accuracy from judgement results.")]
+    [Required]
+    [SerializeField]
+    private ChartScoreController _chartScoreController;
+
+    [TabGroup("Controller")]
     [Tooltip("스테이지 준비 확인부터 차트 러닝 시작까지의 한 판 시작 흐름을 관리하는 컨트롤러입니다.")]
     [Required]
     [SerializeField]
@@ -57,6 +63,11 @@ public class GameRoot : Singleton<GameRoot>
     [Tooltip("ChartStage 배치 캐시를 Gameplay 플레이 표면 View에 표시하는 Presenter입니다.")]
     [SerializeField]
     private ChartPlaySurfacePresenter _chartPlaySurfacePresenter;
+
+    [TabGroup("Presenter")]
+    [Tooltip("Displays Gameplay HUD information such as SAMSU, Profit, Combo, BUY/SELL, and judgement text.")]
+    [SerializeField]
+    private ChartGameplayHudPresenter _chartGameplayHudPresenter;
 
     //==============================================================================
     // 프로퍼티
@@ -73,6 +84,9 @@ public class GameRoot : Singleton<GameRoot>
 
     /// <summary>차트 노트 판정 시스템의 외부 공개 계약입니다.</summary>
     public IChartJudgementService ChartJudgement => _chartJudgementController;
+
+    /// <summary>Gameplay score state public contract.</summary>
+    public IChartScoreService ChartScore => _chartScoreController;
 
     /// <summary>차트 플레이 시작 흐름의 외부 공개 계약입니다.</summary>
     public IChartPlayService ChartPlay => _chartPlayController;
@@ -109,7 +123,6 @@ public class GameRoot : Singleton<GameRoot>
         }
 
         _chartStageController.Init(_chartRunController);
-        InitChartPlaySurfacePresenter();
 
         if (_chartInputController == null)
         {
@@ -129,7 +142,10 @@ public class GameRoot : Singleton<GameRoot>
             _chartInputController,
             _chartStageController,
             _chartRunController);
+        InitChartScoreController();
+        InitChartPlaySurfacePresenter();
         InitChartCameraFollowPresenter();
+        InitChartGameplayHudPresenter();
 
         if (_chartPlayController == null)
         {
@@ -141,10 +157,29 @@ public class GameRoot : Singleton<GameRoot>
             _chartStageController,
             _chartInputController,
             _chartJudgementController,
+            _chartScoreController,
             _chartRunController);
     }
 
-    /// <summary>선택적으로 등록된 카메라 Follow Presenter를 초기화합니다.</summary>
+    /// <summary>Initializes the gameplay score controller used by HUD and future result flow.</summary>
+    private void InitChartScoreController()
+    {
+        _chartScoreController = EnsureRuntimeComponent(
+            _chartScoreController,
+            "ChartScoreController");
+
+        if (_chartScoreController == null)
+        {
+            Debug.LogWarning("[GameRoot] ChartScoreController is not available.");
+            return;
+        }
+
+        _chartScoreController.Init(
+            _chartJudgementController,
+            _chartStageController);
+    }
+
+    /// <summary>Initializes the optional camera follow presenter.</summary>
     private void InitChartCameraFollowPresenter()
     {
         if (_chartCameraFollowPresenter == null)
@@ -167,5 +202,49 @@ public class GameRoot : Singleton<GameRoot>
         }
 
         _chartPlaySurfacePresenter.Init(_chartStageController);
+    }
+
+    /// <summary>Initializes the gameplay HUD presenter and creates a runtime HUD when scene wiring is missing.</summary>
+    private void InitChartGameplayHudPresenter()
+    {
+        _chartGameplayHudPresenter = EnsureRuntimeComponent(
+            _chartGameplayHudPresenter,
+            "ChartGameplayHudPresenter");
+
+        if (_chartGameplayHudPresenter == null)
+        {
+            return;
+        }
+
+        _chartGameplayHudPresenter.Init(
+            _chartStageController,
+            _chartScoreController);
+    }
+
+    /// <summary>
+    /// Finds an existing child component or creates one for runtime-only MVP wiring.
+    /// </summary>
+    /// <typeparam name="T">Component type to find or create.</typeparam>
+    /// <param name="component">Serialized component reference.</param>
+    /// <param name="componentObjectName">Name used for a generated child GameObject.</param>
+    /// <returns>Existing or generated component instance.</returns>
+    private T EnsureRuntimeComponent<T>(T component, string componentObjectName)
+        where T : Component
+    {
+        if (component != null)
+        {
+            return component;
+        }
+
+        T childComponent = GetComponentInChildren<T>(true);
+
+        if (childComponent != null)
+        {
+            return childComponent;
+        }
+
+        GameObject componentObject = new GameObject(componentObjectName);
+        componentObject.transform.SetParent(transform, false);
+        return componentObject.AddComponent<T>();
     }
 }

@@ -163,6 +163,9 @@ public class ChartJudgementController : MonoBehaviour, IChartJudgementService
     /// <summary>새 판정 결과가 생성될 때 결과 소비 없이 발행되는 이벤트입니다.</summary>
     public event Action<ChartJudgementResult> JudgementResultCreated;
 
+    /// <summary>플레이어 입력에 반응해 카메라가 포커스할 캔들을 요청하는 이벤트입니다.</summary>
+    public event Action<ChartPlacedNote> InputNoteFocusRequested;
+
     /// <summary>현재 ChartRun 기준 스테이지 진행 시간입니다.</summary>
     [TabGroup("Runtime")]
     [ShowInInspector]
@@ -363,10 +366,11 @@ public class ChartJudgementController : MonoBehaviour, IChartJudgementService
 
         placedNote.MarkJudged();
         EnqueueResult(result);
+        RequestInputNoteFocus(placedNote);
         return true;
     }
 
-    /// <summary>GOOD 판정 폭을 지나친 미판정 필수 노트를 MISS 처리합니다.</summary>
+    /// <summary>GOOD 판정 창을 지나친 미판정 필수 노트를 MISS 처리합니다.</summary>
     private void ProcessMissedNotes()
     {
         IReadOnlyList<ChartPlacedNote> placedNotes = _chartStageService.PlacedNotes;
@@ -517,6 +521,18 @@ public class ChartJudgementController : MonoBehaviour, IChartJudgementService
         JudgementResultCreated?.Invoke(judgementResult);
     }
 
+    /// <summary>입력 판정에 사용된 캔들을 카메라 포커스 대상으로 알립니다.</summary>
+    /// <param name="placedNote">플레이어 입력과 매칭된 배치 캔들입니다.</param>
+    private void RequestInputNoteFocus(ChartPlacedNote placedNote)
+    {
+        if (placedNote == null)
+        {
+            return;
+        }
+
+        InputNoteFocusRequested?.Invoke(placedNote);
+    }
+
     /// <summary>내부 판정 결과 상태만 초기화합니다.</summary>
     private void ResetInternalResultState()
     {
@@ -531,7 +547,6 @@ public class ChartJudgementController : MonoBehaviour, IChartJudgementService
         _perfectTimeWindow = GetSafeNonNegativeValue(_perfectTimeWindow, DEFAULT_PERFECT_TIME_WINDOW);
         _greatTimeWindow = GetSafeNonNegativeValue(_greatTimeWindow, DEFAULT_GREAT_TIME_WINDOW);
         _goodTimeWindow = GetSafeNonNegativeValue(_goodTimeWindow, DEFAULT_GOOD_TIME_WINDOW);
-
         if (_greatTimeWindow < _perfectTimeWindow)
         {
             _greatTimeWindow = _perfectTimeWindow;

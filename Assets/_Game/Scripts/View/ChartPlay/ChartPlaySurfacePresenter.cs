@@ -272,7 +272,6 @@ public class ChartPlaySurfacePresenter : MonoBehaviour
         }
 
         IChartStageService chartStageService = gameRoot.ChartStage;
-
         if (chartStageService == null)
         {
             LogWarning("GameRoot의 ChartStage 서비스가 null이라 자동 초기화를 건너뜁니다.");

@@ -39,6 +39,9 @@ public class ChartPlayController : MonoBehaviour, IChartPlayService
     // 입력 판정 활성화와 판정 상태 초기화를 제공하는 서비스입니다.
     private IChartJudgementService _chartJudgementService;
 
+    // Gameplay Profit and Combo state service.
+    private IChartScoreService _chartScoreService;
+
     // 실제 차트 시간축 시작을 담당하는 러닝 서비스입니다.
     private IChartRunService _chartRunService;
 
@@ -70,16 +73,19 @@ public class ChartPlayController : MonoBehaviour, IChartPlayService
     /// <param name="chartStageService">스테이지 준비 상태와 배치 노트를 제공하는 서비스입니다.</param>
     /// <param name="chartInputService">BUY / SELL 입력을 제어하는 서비스입니다.</param>
     /// <param name="chartJudgementService">입력 판정을 제어하는 서비스입니다.</param>
+    /// <param name="chartScoreService">Gameplay Profit and Combo state service.</param>
     /// <param name="chartRunService">차트 러닝을 시작하는 서비스입니다.</param>
     public void Init(
         IChartStageService chartStageService,
         IChartInputService chartInputService,
         IChartJudgementService chartJudgementService,
+        IChartScoreService chartScoreService,
         IChartRunService chartRunService)
     {
         _chartStageService = chartStageService;
         _chartInputService = chartInputService;
         _chartJudgementService = chartJudgementService;
+        _chartScoreService = chartScoreService;
         _chartRunService = chartRunService;
 
         _isInitialized = true;
@@ -127,6 +133,7 @@ public class ChartPlayController : MonoBehaviour, IChartPlayService
     {
         _chartJudgementService.ResetJudgementState();
         _chartInputService.ClearBufferedInputs();
+        _chartScoreService.ResetScoreState();
     }
 
     /// <summary>
@@ -202,6 +209,18 @@ public class ChartPlayController : MonoBehaviour, IChartPlayService
             return true;
         }
 
+        if (_chartScoreService == null)
+        {
+            blockReason = "ChartScore service is missing, so gameplay score state cannot start.";
+            return true;
+        }
+
+        if (_chartScoreService.IsInitialized == false)
+        {
+            blockReason = "ChartScore service is not initialized.";
+            return true;
+        }
+
         if (_chartRunService == null)
         {
             blockReason = "ChartRun 서비스가 없어 플레이를 시작할 수 없습니다.";
@@ -220,6 +239,11 @@ public class ChartPlayController : MonoBehaviour, IChartPlayService
     /// <summary>초기화 시 누락된 의존성이 있는지 확인해 경고를 출력합니다.</summary>
     private void LogMissingDependencies()
     {
+        if (_chartScoreService == null)
+        {
+            LogWarning("ChartScore service is not connected.");
+        }
+
         if (_chartStageService == null)
         {
             LogWarning("ChartStage 서비스가 연결되지 않았습니다.");

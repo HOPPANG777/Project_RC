@@ -13,6 +13,9 @@ public interface IChartJudgementService
     /// <summary>새 판정 결과가 생성될 때 결과 소비 없이 발행되는 이벤트입니다.</summary>
     event Action<ChartJudgementResult> JudgementResultCreated;
 
+    /// <summary>플레이어 입력에 반응해 카메라가 포커스할 캔들을 요청하는 이벤트입니다.</summary>
+    event Action<ChartPlacedNote> InputNoteFocusRequested;
+
     /// <summary>GameRoot를 통해 초기화되었는지 여부입니다.</summary>
     bool IsInitialized { get; }
 

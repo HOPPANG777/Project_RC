@@ -27,20 +27,29 @@ public class ChartCameraFollowPresenter : MonoBehaviour
 
     private const float DEFAULT_VERTICAL_FOLLOW_SHARPNESS = 10.0f;
 
-    // 입력 캔들 목표로 이동할 때 사용하는 기본 빠른 접근 비율입니다.
     private const float DEFAULT_INPUT_NOTE_FAST_APPROACH_RATIO = 0.75f;
 
-    // 입력 캔들 목표로 이동할 때 사용하는 기본 보간 강도입니다.
     private const float DEFAULT_INPUT_NOTE_APPROACH_SHARPNESS = 16.0f;
 
-    // 입력 캔들 목표 도달로 인정할 기본 거리입니다.
     private const float DEFAULT_INPUT_NOTE_ARRIVAL_DISTANCE = 0.02f;
 
-    // 비율 보정에 사용하는 최소값입니다.
+    private const float DEFAULT_INPUT_NOTE_ACCELERATION_DURATION = 0.08f;
+
     private const float MIN_NORMALIZED_RATIO = 0.0f;
 
-    // 비율 보정에 사용하는 최대값입니다.
     private const float MAX_NORMALIZED_RATIO = 1.0f;
+
+    // 입력 캔들 목표로 이동할 때 사용하는 기본 빠른 접근 비율입니다.
+
+    // 입력 캔들 목표로 이동할 때 사용하는 기본 보간 강도입니다.
+
+    // 입력 캔들 목표 도달로 인정할 기본 거리입니다.
+
+    // 입력 캔들 포커스 이동 시작 시 첫 프레임 급가속을 막는 기본 램프 시간입니다.
+
+    // 비율 보정에 사용하는 최소값입니다.
+
+    // 비율 보정에 사용하는 최대값입니다.
 
     //==============================================================================
     // 내부 타입
@@ -152,6 +161,12 @@ public class ChartCameraFollowPresenter : MonoBehaviour
     [SerializeField]
     private float _inputNoteArrivalDistance = DEFAULT_INPUT_NOTE_ARRIVAL_DISTANCE;
 
+    [TabGroup("Input Note Focus")]
+    [Tooltip("입력 캔들 목표로 이동을 시작할 때 첫 프레임 급가속을 막는 램프 시간(초)입니다.")]
+    [MinValue(MIN_FOLLOW_SCALE)]
+    [SerializeField]
+    private float _inputNoteAccelerationDuration = DEFAULT_INPUT_NOTE_ACCELERATION_DURATION;
+
     //==============================================================================
     // 내부 상태
     //==============================================================================
@@ -183,11 +198,14 @@ public class ChartCameraFollowPresenter : MonoBehaviour
     // 입력 캔들 포커스가 시작될 때의 이동 거리입니다.
     private float _judgementFocusInitialDistance;
 
+    // 입력 캔들 포커스가 시작된 뒤 흐른 시간입니다.
+    private float _judgementFocusElapsed;
+
     // 입력 캔들 중심 보정 오프셋이 활성화되어 있는지 여부입니다.
     private bool _hasJudgementFocusOffset;
 
     // 판정 결과 이벤트 구독이 이미 등록되어 있는지 여부입니다.
-    private bool _isJudgementResultEventSubscribed;
+    private bool _isInputNoteFocusEventSubscribed;
 
     // Follow 기준으로 삼는 초기 CurrentX입니다.
     private float _originCurrentX;
@@ -311,10 +329,10 @@ public class ChartCameraFollowPresenter : MonoBehaviour
         ClampSettings();
     }
 
-    /// <summary>판정 결과 이벤트 구독을 정리합니다.</summary>
+    /// <summary>입력 노트 포커스 이벤트 구독을 정리합니다.</summary>
     private void OnDestroy()
     {
-        UnsubscribeJudgementResultEvent();
+        UnsubscribeInputNoteFocusEvent();
     }
 
     //==============================================================================
@@ -443,6 +461,9 @@ public class ChartCameraFollowPresenter : MonoBehaviour
         _inputNoteArrivalDistance = GetSafeNonNegativeValue(
             _inputNoteArrivalDistance,
             DEFAULT_INPUT_NOTE_ARRIVAL_DISTANCE);
+        _inputNoteAccelerationDuration = GetSafeNonNegativeValue(
+            _inputNoteAccelerationDuration,
+            DEFAULT_INPUT_NOTE_ACCELERATION_DURATION);
     }
 
     /// <summary>GameRoot에 등록된 ChartRun 서비스를 자동으로 연결합니다.</summary>
@@ -514,75 +535,65 @@ public class ChartCameraFollowPresenter : MonoBehaviour
     {
         if (_chartJudgementService == chartJudgementService)
         {
-            SubscribeJudgementResultEvent();
+            SubscribeInputNoteFocusEvent();
             return;
         }
 
-        UnsubscribeJudgementResultEvent();
+        UnsubscribeInputNoteFocusEvent();
         _chartJudgementService = chartJudgementService;
-        SubscribeJudgementResultEvent();
+        SubscribeInputNoteFocusEvent();
     }
 
-    /// <summary>판정 결과 발생 이벤트를 구독합니다.</summary>
-    private void SubscribeJudgementResultEvent()
+    /// <summary>입력 노트 포커스 요청 이벤트를 구독합니다.</summary>
+    private void SubscribeInputNoteFocusEvent()
     {
         if (_chartJudgementService == null)
         {
             return;
         }
 
-        if (_isJudgementResultEventSubscribed)
+        if (_isInputNoteFocusEventSubscribed)
         {
             return;
         }
 
-        _chartJudgementService.JudgementResultCreated += HandleJudgementResultCreated;
-        _isJudgementResultEventSubscribed = true;
+        _chartJudgementService.InputNoteFocusRequested += HandleInputNoteFocusRequested;
+        _isInputNoteFocusEventSubscribed = true;
     }
 
-    /// <summary>판정 결과 발생 이벤트 구독을 해제합니다.</summary>
-    private void UnsubscribeJudgementResultEvent()
+    /// <summary>입력 노트 포커스 요청 이벤트 구독을 해제합니다.</summary>
+    private void UnsubscribeInputNoteFocusEvent()
     {
         if (_chartJudgementService == null)
         {
-            _isJudgementResultEventSubscribed = false;
+            _isInputNoteFocusEventSubscribed = false;
             return;
         }
 
-        if (_isJudgementResultEventSubscribed == false)
+        if (_isInputNoteFocusEventSubscribed == false)
         {
             return;
         }
 
-        _chartJudgementService.JudgementResultCreated -= HandleJudgementResultCreated;
-        _isJudgementResultEventSubscribed = false;
+        _chartJudgementService.InputNoteFocusRequested -= HandleInputNoteFocusRequested;
+        _isInputNoteFocusEventSubscribed = false;
     }
 
-    /// <summary>입력이 포함된 판정 결과를 기준으로 카메라 보정 목표를 갱신합니다.</summary>
-    /// <param name="result">새로 생성된 판정 결과입니다.</param>
-    private void HandleJudgementResultCreated(ChartJudgementResult result)
+    /// <summary>입력 포커스 요청으로 전달된 캔들을 기준으로 카메라 보정 목표를 갱신합니다.</summary>
+    /// <param name="placedNote">카메라가 포커스할 배치 캔들입니다.</param>
+    private void HandleInputNoteFocusRequested(ChartPlacedNote placedNote)
     {
         if (_inputNoteFollowEnabled == false)
         {
             return;
         }
 
-        if (result.IsValid == false)
+        if (placedNote == null)
         {
             return;
         }
 
-        if (result.HasInput == false)
-        {
-            return;
-        }
-
-        if (result.PlacedNote == null)
-        {
-            return;
-        }
-
-        SetJudgementFocusTarget(result.PlacedNote);
+        SetJudgementFocusTarget(placedNote);
     }
 
     /// <summary>입력된 캔들이 화면 중심 쪽에 오도록 Follow 보정 목표를 계산합니다.</summary>
@@ -607,6 +618,7 @@ public class ChartCameraFollowPresenter : MonoBehaviour
 
         _judgementFocusPlacedNote = placedNote;
         _hasJudgementFocusOffset = true;
+        _judgementFocusElapsed = 0.0f;
 
         float deltaX = (_chartRunService.CurrentX - _originCurrentX) * _followScale;
         float deltaY = GetChartCenterDeltaY();
@@ -847,6 +859,8 @@ public class ChartCameraFollowPresenter : MonoBehaviour
             return targetOffset;
         }
 
+        _judgementFocusElapsed += Time.deltaTime;
+
         float t = GetJudgementFocusApproachT(remainingDistance);
         return Vector3.Lerp(currentOffset, targetOffset, Mathf.Clamp01(t));
     }
@@ -866,7 +880,16 @@ public class ChartCameraFollowPresenter : MonoBehaviour
             sharpness *= Mathf.Lerp(0.25f, 1.0f, normalizedSlowDistance);
         }
 
-        return 1.0f - Mathf.Exp(-sharpness * Time.deltaTime);
+        float t = 1.0f - Mathf.Exp(-sharpness * Time.deltaTime);
+
+        if (_inputNoteAccelerationDuration <= 0.0f)
+        {
+            return t;
+        }
+
+        float accelerationT = Mathf.Clamp01(_judgementFocusElapsed / _inputNoteAccelerationDuration);
+        float accelerationWeight = Mathf.SmoothStep(0.0f, 1.0f, accelerationT);
+        return t * accelerationWeight;
     }
 
     /// <summary>입력 캔들 포커스가 목표 오프셋에 도달했는지 확인합니다.</summary>
@@ -884,6 +907,7 @@ public class ChartCameraFollowPresenter : MonoBehaviour
         _targetJudgementFocusOffset = Vector3.zero;
         _judgementFocusPlacedNote = null;
         _judgementFocusInitialDistance = 0.0f;
+        _judgementFocusElapsed = 0.0f;
         _hasJudgementFocusOffset = false;
     }
 
@@ -949,7 +973,7 @@ public class ChartCameraFollowPresenter : MonoBehaviour
     /// <returns>보간된 Y 위치입니다.</returns>
     private float GetFollowedYPosition(float currentY, float targetY)
     {
-        if (_followChartCenterY == false && _hasJudgementFocusOffset == false)
+        if (_followChartCenterY == false)
         {
             return targetY;
         }

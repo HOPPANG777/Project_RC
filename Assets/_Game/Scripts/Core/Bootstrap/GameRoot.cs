@@ -142,7 +142,11 @@ public class GameRoot : Singleton<GameRoot>
             _chartInputController,
             _chartStageController,
             _chartRunController);
-        InitChartScoreController();
+        if (InitChartScoreController() == false)
+        {
+            return;
+        }
+
         InitChartPlaySurfacePresenter();
         InitChartCameraFollowPresenter();
         InitChartGameplayHudPresenter();
@@ -162,21 +166,19 @@ public class GameRoot : Singleton<GameRoot>
     }
 
     /// <summary>Initializes the gameplay score controller used by HUD and future result flow.</summary>
-    private void InitChartScoreController()
+    private bool InitChartScoreController()
     {
-        _chartScoreController = EnsureRuntimeComponent(
-            _chartScoreController,
-            "ChartScoreController");
-
         if (_chartScoreController == null)
         {
-            Debug.LogWarning("[GameRoot] ChartScoreController is not available.");
-            return;
+            Debug.LogWarning("[GameRoot] ChartScoreController가 연결되지 않았습니다.");
+            return false;
         }
 
         _chartScoreController.Init(
             _chartJudgementController,
             _chartStageController);
+
+        return true;
     }
 
     /// <summary>Initializes the optional camera follow presenter.</summary>
@@ -207,10 +209,6 @@ public class GameRoot : Singleton<GameRoot>
     /// <summary>Initializes the gameplay HUD presenter and creates a runtime HUD when scene wiring is missing.</summary>
     private void InitChartGameplayHudPresenter()
     {
-        _chartGameplayHudPresenter = EnsureRuntimeComponent(
-            _chartGameplayHudPresenter,
-            "ChartGameplayHudPresenter");
-
         if (_chartGameplayHudPresenter == null)
         {
             return;
@@ -219,32 +217,5 @@ public class GameRoot : Singleton<GameRoot>
         _chartGameplayHudPresenter.Init(
             _chartStageController,
             _chartScoreController);
-    }
-
-    /// <summary>
-    /// Finds an existing child component or creates one for runtime-only MVP wiring.
-    /// </summary>
-    /// <typeparam name="T">Component type to find or create.</typeparam>
-    /// <param name="component">Serialized component reference.</param>
-    /// <param name="componentObjectName">Name used for a generated child GameObject.</param>
-    /// <returns>Existing or generated component instance.</returns>
-    private T EnsureRuntimeComponent<T>(T component, string componentObjectName)
-        where T : Component
-    {
-        if (component != null)
-        {
-            return component;
-        }
-
-        T childComponent = GetComponentInChildren<T>(true);
-
-        if (childComponent != null)
-        {
-            return childComponent;
-        }
-
-        GameObject componentObject = new GameObject(componentObjectName);
-        componentObject.transform.SetParent(transform, false);
-        return componentObject.AddComponent<T>();
     }
 }

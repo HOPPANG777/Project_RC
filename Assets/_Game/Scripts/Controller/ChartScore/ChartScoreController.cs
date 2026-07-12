@@ -9,7 +9,7 @@ using UnityEngine;
 //==============================================================================
 // Implementation notes
 // - JudgementController remains the source of truth for judgement grade and score.
-// - This controller only accumulates state and publishes score events for HUD/result views.
+// - This controller consumes buffered judgement results and publishes score events for HUD/result views.
 // - Combo increases on hit judgements and resets on MISS.
 //==============================================================================
 
@@ -54,7 +54,7 @@ public class ChartScoreController : MonoBehaviour, IChartScoreService
     // Whether a valid judgement has been recorded since the latest reset.
     private bool _hasLastJudgementResult;
 
-    // Judgement service that emits note judgement results.
+    // Judgement service that buffers note judgement results.
     private IChartJudgementService _chartJudgementService;
 
     // Stage service used to count required notes for the current stage.
@@ -140,10 +140,15 @@ public class ChartScoreController : MonoBehaviour, IChartScoreService
     // Unity Lifecycle
     //==============================================================================
 
-    /// <summary>Removes event subscriptions before the component is destroyed.</summary>
-    private void OnDestroy()
+    /// <summary>Consumes pending judgement results every frame after initialization.</summary>
+    private void Update()
     {
-        UnsubscribeJudgementService();
+        if (CanConsumeJudgementResults() == false)
+        {
+            return;
+        }
+
+        ConsumeBufferedJudgementResults();
     }
 
     //==============================================================================
@@ -159,12 +164,9 @@ public class ChartScoreController : MonoBehaviour, IChartScoreService
         IChartJudgementService chartJudgementService,
         IChartStageService chartStageService)
     {
-        UnsubscribeJudgementService();
-
         _chartJudgementService = chartJudgementService;
         _chartStageService = chartStageService;
 
-        SubscribeJudgementService();
         ResetScoreState();
 
         _isInitialized = true;
@@ -194,33 +196,37 @@ public class ChartScoreController : MonoBehaviour, IChartScoreService
     // Internal Logic
     //==============================================================================
 
-    /// <summary>Subscribes to judgement events if the service is available.</summary>
-    private void SubscribeJudgementService()
+    /// <summary>Checks whether buffered judgement results can be consumed.</summary>
+    /// <returns>True when the judgement service is ready to provide results.</returns>
+    private bool CanConsumeJudgementResults()
     {
-        if (_chartJudgementService == null)
+        if (_isInitialized == false)
         {
-            return;
+            return false;
         }
 
-        _chartJudgementService.JudgementResultCreated += HandleJudgementResultCreated;
+        if (_chartJudgementService == null)
+        {
+            return false;
+        }
+
+        return _chartJudgementService.IsInitialized;
     }
 
-    /// <summary>Unsubscribes from judgement events if the service is available.</summary>
-    private void UnsubscribeJudgementService()
+    /// <summary>Consumes every pending judgement result from the judgement service buffer.</summary>
+    private void ConsumeBufferedJudgementResults()
     {
-        if (_chartJudgementService == null)
+        while (_chartJudgementService.TryConsumeResult(out ChartJudgementResult judgementResult))
         {
-            return;
+            RecordJudgementResult(judgementResult);
         }
-
-        _chartJudgementService.JudgementResultCreated -= HandleJudgementResultCreated;
     }
 
     /// <summary>
     /// Applies a valid judgement result to Profit, Combo, and Accuracy state.
     /// </summary>
     /// <param name="judgementResult">Judgement result emitted by ChartJudgementController.</param>
-    private void HandleJudgementResultCreated(ChartJudgementResult judgementResult)
+    private void RecordJudgementResult(ChartJudgementResult judgementResult)
     {
         if (judgementResult.IsValid == false)
         {

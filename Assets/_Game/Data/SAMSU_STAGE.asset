@@ -18,7 +18,7 @@ MonoBehaviour:
   _bpm: 120
   _musicClip: {fileID: 0}
   _notes:
-  - _time: 0.8
+  - _time: 1.5
     _side: 0
     _value: -1.2
     _useCustomCandleShape: 1
@@ -27,7 +27,7 @@ MonoBehaviour:
     _lowValue: -1.77
     _label: Open
     _isRequired: 1
-  - _time: 1.5
+  - _time: 2.2
     _side: 0
     _value: -0.8
     _useCustomCandleShape: 1
@@ -36,7 +36,7 @@ MonoBehaviour:
     _lowValue: -1.32
     _label: Push
     _isRequired: 1
-  - _time: 2.2
+  - _time: 2.7
     _side: 0
     _value: -0.35
     _useCustomCandleShape: 1
@@ -45,7 +45,7 @@ MonoBehaviour:
     _lowValue: -0.96
     _label: Pull
     _isRequired: 1
-  - _time: 2.9
+  - _time: 3.6
     _side: 0
     _value: 0.05
     _useCustomCandleShape: 1
@@ -54,7 +54,7 @@ MonoBehaviour:
     _lowValue: -0.48
     _label: Rebound
     _isRequired: 1
-  - _time: 3.6
+  - _time: 4.3
     _side: 0
     _value: 0.45
     _useCustomCandleShape: 1
@@ -63,7 +63,7 @@ MonoBehaviour:
     _lowValue: -0.08
     _label: Rally
     _isRequired: 1
-  - _time: 4.3
+  - _time: 5
     _side: 0
     _value: 0.9
     _useCustomCandleShape: 1
@@ -72,7 +72,7 @@ MonoBehaviour:
     _lowValue: 0.36
     _label: Dip
     _isRequired: 1
-  - _time: 5
+  - _time: 5.7
     _side: 1
     _value: 0.55
     _useCustomCandleShape: 1
@@ -81,7 +81,7 @@ MonoBehaviour:
     _lowValue: 0.35
     _label: Drop
     _isRequired: 1
-  - _time: 5.7
+  - _time: 6.4
     _side: 1
     _value: 0.15
     _useCustomCandleShape: 1
@@ -90,7 +90,7 @@ MonoBehaviour:
     _lowValue: 0.02
     _label: Bounce
     _isRequired: 1
-  - _time: 6.4
+  - _time: 7.1
     _side: 0
     _value: 0.65
     _useCustomCandleShape: 1
@@ -99,7 +99,7 @@ MonoBehaviour:
     _lowValue: -0.06
     _label: Lift
     _isRequired: 1
-  - _time: 7.1
+  - _time: 7.8
     _side: 0
     _value: 1.1
     _useCustomCandleShape: 1
@@ -108,7 +108,7 @@ MonoBehaviour:
     _lowValue: 0.57
     _label: Break
     _isRequired: 1
-  - _time: 7.8
+  - _time: 8.5
     _side: 0
     _value: 1.45
     _useCustomCandleShape: 1
@@ -117,7 +117,7 @@ MonoBehaviour:
     _lowValue: 0.94
     _label: Reject
     _isRequired: 1
-  - _time: 8.5
+  - _time: 9.2
     _side: 1
     _value: 1.05
     _useCustomCandleShape: 1
@@ -126,7 +126,7 @@ MonoBehaviour:
     _lowValue: 0.83
     _label: Slide
     _isRequired: 1
-  - _time: 9.2
+  - _time: 9.9
     _side: 1
     _value: 0.55
     _useCustomCandleShape: 1
@@ -135,7 +135,7 @@ MonoBehaviour:
     _lowValue: 0.42
     _label: Fade
     _isRequired: 1
-  - _time: 9.9
+  - _time: 10.6
     _side: 1
     _value: 0.05
     _useCustomCandleShape: 1
@@ -144,7 +144,7 @@ MonoBehaviour:
     _lowValue: -0.13
     _label: Catch
     _isRequired: 1
-  - _time: 10.6
+  - _time: 11.3
     _side: 1
     _value: -0.35
     _useCustomCandleShape: 1

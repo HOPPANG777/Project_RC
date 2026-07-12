@@ -252,7 +252,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9e00516f5b404617839783e2e1e4acde, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::ChartJudgementController
   _judgementEnabledOnStart: 1
   _perfectTimeWindow: 0.04
@@ -260,6 +260,50 @@ MonoBehaviour:
   _goodTimeWindow: 0.1
   _maxBufferedResultCount: 64
   _clearResultsOnDisable: 1
+--- !u!1 &3100000400
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3100000401}
+  - component: {fileID: 3100000402}
+  m_Layer: 0
+  m_Name: ChartScore
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3100000401
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3100000400}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2104384979}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3100000402
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3100000400}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf1bbc3baf8b4c618a391255b533dfa5, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::ChartScoreController
 --- !u!1 &989353553
 GameObject:
   m_ObjectHideFlags: 0
@@ -738,8 +782,10 @@ Transform:
   - {fileID: 2111659351}
   - {fileID: 1158560694}
   - {fileID: 821987009}
+  - {fileID: 3100000401}
   - {fileID: 3100000001}
   - {fileID: 3100000101}
+  - {fileID: 3100000501}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2104384981
@@ -758,9 +804,11 @@ MonoBehaviour:
   _chartStageController: {fileID: 2111659352}
   _chartInputController: {fileID: 1158560695}
   _chartJudgementController: {fileID: 821987010}
+  _chartScoreController: {fileID: 3100000402}
   _chartPlayController: {fileID: 3100000002}
   _chartCameraFollowPresenter: {fileID: 2029174212}
   _chartPlaySurfacePresenter: {fileID: 3100000103}
+  _chartGameplayHudPresenter: {fileID: 3100000502}
 --- !u!1 &2111659350
 GameObject:
   m_ObjectHideFlags: 0
@@ -854,6 +902,68 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ChartPlayController
   _autoStartOnInit: 1
+--- !u!1 &3100000500
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3100000501}
+  - component: {fileID: 3100000502}
+  m_Layer: 0
+  m_Name: ChartGameplayHud
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3100000501
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3100000500}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2104384979}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3100000502
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3100000500}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59a16983624b4bbd919c01d3f8711d83, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::ChartGameplayHudPresenter
+  _canvasRoot: {fileID: 0}
+  _stageText: {fileID: 0}
+  _profitText: {fileID: 0}
+  _comboText: {fileID: 0}
+  _buyText: {fileID: 0}
+  _sellText: {fileID: 0}
+  _judgementText: {fileID: 0}
+  _autoCreateMissingHud: 1
+  _canvasSortOrder: 100
+  _judgementDisplaySeconds: 0.55
+  _primaryTextColor: {r: 0.86, g: 0.92, b: 1, a: 1}
+  _secondaryTextColor: {r: 0.62, g: 0.7, b: 0.82, a: 1}
+  _buyColor: {r: 0.22, g: 0.86, b: 0.45, a: 1}
+  _sellColor: {r: 1, g: 0.27, b: 0.32, a: 1}
+  _perfectColor: {r: 1, g: 0.91, b: 0.34, a: 1}
+  _greatColor: {r: 0.42, g: 0.82, b: 1, a: 1}
+  _goodColor: {r: 0.56, g: 0.95, b: 0.62, a: 1}
+  _missColor: {r: 1, g: 0.34, b: 0.42, a: 1}
 --- !u!1 &3100000100
 GameObject:
   m_ObjectHideFlags: 0
